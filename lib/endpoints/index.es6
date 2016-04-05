@@ -2,15 +2,25 @@
 
 import express from "express";
 import {DomainService} from "./services/domainService";
+import mongodb from "mongodb";
+import logger from "../util/FocusApiLogger";
+import {getGenericRepoInstance} from "../endpoints/generic/GenericRepository";
 
 let router = express.Router(),
-  domainRoute = router.route("/domain/:name");
+  domainRoute = router.route("/domain/:name"),
 // domainPortletRoute = router.route("/domain/:name/:groupId/:portletId"),
 // leadershipRoute = router.route("/leadership"),
 // leadershipActionableRoute = router.route("/actionable/:id"),
 // loginRoute = router.route("/login");
+  {NODE_ENV} = process.env,
+  nodeEnv = NODE_ENV || "local",
+  config = Object.freeze(require("../../config/" + nodeEnv)),
+  genericRepo, domainService;
+
+genericRepo = getGenericRepoInstance({"config": config, "mongodb": mongodb, "loggerInstance": logger});
+domainService = new DomainService(genericRepo);
 
 domainRoute
-  .get(DomainService.getDashboard.bind(DomainService));
+  .get(domainService.getDashboard.bind(domainService));
 
 export {router};

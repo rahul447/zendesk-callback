@@ -9,6 +9,16 @@ var environmentVariables = require("./environmentVariables"),
       "domain": "127.0.0.1",
       "port": 8010
     },
+    "logger": {
+      name: "focus-api",
+      level: environmentVariables.FOCUS_LOGGING_LEVEL,
+      "console": true,
+      "streams": [
+        {
+          "path": "/var/log/fhir"
+        }
+      ]
+    },
     "mongoDb": {
       "connectionString": environmentVariables.FOCUS_MONGO_CONNECTION_STRING,
       "operationTimeout": 4000,

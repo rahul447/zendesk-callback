@@ -1,16 +1,12 @@
 "use strict";
 
-// import chLogger from "ch-logger";
+import {getLoggerInstance} from "ch-logger";
 
-let instance = null,
-  nodeEnv = process.env.NODE_ENV || "local",
+let nodeEnv = process.env.NODE_ENV || "local",
   config = require("../../config/" + nodeEnv),
-  loggerOptions = config.logger || {};
+  loggerOptions = config.logger || {},
+  loggerInstance = getLoggerInstance("focus-api", loggerOptions);
 
 console.log("logger option", loggerOptions);
 
-// instance = new chLogger(loggerOptions);
-
-// instance.info("FHIR Api: Logger initialized.", instance);
-
-export default instance;
+export default loggerInstance;
