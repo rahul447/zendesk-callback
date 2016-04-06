@@ -6,7 +6,7 @@ import methodOverride from "method-override";
 import mwAllowCrossDomain from "./middleware_services/mwAllowCrossDomain";
 import mwErrorHandler from "./middleware_services/mwErrorHandler";
 import checkEnvironmentVariables from "./util/checkEnvironmentVariables";
-import {router} from "./endpoints";
+import router from "./endpoints/index";
 
 let {NODE_ENV} = process.env,
   nodeEnv = NODE_ENV || "local",
@@ -27,7 +27,6 @@ app.set("port", config.http.port);
 // Defines top middleware and routes
 app.use(mwAllowCrossDomain);
 app.use(bodyParser.json());
-
 app.use("/", router);
 
 app.use(methodOverride);

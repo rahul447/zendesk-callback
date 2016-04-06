@@ -18,9 +18,9 @@ let router = express.Router(),
   genericRepo, domainService;
 
 genericRepo = getGenericRepoInstance({"config": config, "mongodb": mongodb, "loggerInstance": loggerInstance});
-domainService = new DomainService(genericRepo, loggerInstance);
+domainService = new DomainService(genericRepo, loggerInstance, mongodb);
 
 domainRoute
   .get(domainService.getDashboard.bind(domainService));
 
-export {router};
+export default router;
