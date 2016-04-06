@@ -11,9 +11,7 @@ export class GenericRepository {
     mongodb,
     loggerInstance
     }) {
-    console.log(config);
-    console.log(mongodb);
-    console.log(loggerInstance);
+
     if (!config ||
       !config.mongoDb ||
       !config.mongoDb.connectionString ||
@@ -24,8 +22,6 @@ export class GenericRepository {
     ) {
       throw new Error("Failed to initialise MongoDB, config or dependencies were missing");
     }
-
-    console.log("inside generic repo ctor");
 
     this.loggerInstance = loggerInstance;
 
@@ -104,56 +100,10 @@ export class GenericRepository {
     );
   }
 
-  create({
-    entity, event
-    }) {
-
-    this.loggerInstance.info("Writing entity to db: ", entity);
-
-    return this.db_
-      .catch(err => {
-        this.loggerInstance.debug("Connection to db is broken at create: ", err);
-        return this.connectToDb_();
-      })
-      .then(db => {
-
-        let collName = this.getEventResourceRelation(event).collection;
-
-        return Q.ninvoke(
-          db.collection(collName),
-          "insertOne", GenericRepository.idSwap(entity),
-          this.commonWriteConcern_
-        );
-      })
-      .timeout(this.promiseTimeout_)
-      .then(writeResult => {
-
-        /* console.log(
-         "Writeresult for insert record: ",
-         {"entity": entity, "writeResult": writeResult}
-         ); */
-
-        if (writeResult.result.n === 0) {
-
-          let err = new Error("Nothing is inserted in db");
-
-          this.loggerInstance.debug("Nothing is inserted in db when trying to create entity: ", entity);
-          throw err;
-        }
-
-        return writeResult.result.n;
-      });
-  }
-
-  update() {
-
-  }
-
   retrieve(param) {
 
-    console.log("inside retrieve");
-
     this.loggerInstance.info("Retreiving from db");
+
     let {collection, filter, projection} = param;
 
     return this.db_
@@ -163,9 +113,7 @@ export class GenericRepository {
       })
       .then(db => {
         this.loggerInstance.debug("Successfully connected");
-        //     let collName = this.getEventResourceRelation(event).collection;
-        // let collName = "users";
-        console.log("calling query");
+
         return Q.ninvoke(
           db.collection(collection),
           "findOne", filter, projection
@@ -179,7 +127,7 @@ export class GenericRepository {
 }
 
 export function getGenericRepoInstance(args) {
-  console.log(protectedGenericRepoInstance);
+
   protectedGenericRepoInstance = protectedGenericRepoInstance || new GenericRepository(args);
   return protectedGenericRepoInstance;
 }

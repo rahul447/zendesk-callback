@@ -15,7 +15,7 @@ var environmentVariables = require("./environmentVariables"),
       "console": true,
       "streams": [
         {
-          "path": "/var/log/fhir"
+          "path": "/var/log/focus"
         }
       ]
     },
