@@ -11,21 +11,19 @@ import {DomainService} from "./services/domainService";
 import {LoginService} from "./services/loginService";
 
 let router = express.Router(),
-
+  {NODE_ENV} = process.env,
+  nodeEnv = NODE_ENV || "local",
+  config = Object.freeze(require("../../config/" + nodeEnv)),
   domainRoute = router.route("/domain/:name"),
   domainPortletRoute = router.route("/domain/:name/:groupId/:portletId"),
   gridRoute = router.route("/grid/:Id"),
   leadershipRoute = router.route("/leadership"),
   emailRoute = router.route("/sendemail"),
-
 // leadershipActionableRoute = router.route("/actionable/:id"),
   loginRoute = router.route("/login"),
-  {NODE_ENV} = process.env,
-  nodeEnv = NODE_ENV || "local",
-  config = Object.freeze(require("../../config/" + nodeEnv)),
   genericRepo = getGenericRepoInstance({"config": config, "mongodb": mongodb, "loggerInstance": loggerInstance}),
-  domainService = new DomainService(genericRepo, loggerInstance),
-  loginService = new LoginService(genericRepo, loggerInstance), 
+  domainService = new DomainService(genericRepo, loggerInstance, mongodb),
+  loginService = new LoginService(genericRepo, loggerInstance),
   leadershipService = new LeaderShipService(genericRepo),
   drillService = new DrillService(genericRepo),
   emailService = new EmailService();
@@ -35,7 +33,6 @@ domainRoute
 
 loginRoute
   .post(loginService.login.bind(loginService));
-
 
 leadershipRoute
   .get(leadershipService.getLeadershipDashboard.bind(leadershipService));
@@ -50,5 +47,3 @@ emailRoute
   .get(emailService.sendmail.bind(emailService));
 
 export {router};
-
-

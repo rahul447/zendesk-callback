@@ -6,7 +6,7 @@ import methodOverride from "method-override";
 import mwAllowCrossDomain from "./middleware_services/mwAllowCrossDomain";
 import mwErrorHandler from "./middleware_services/mwErrorHandler";
 import checkEnvironmentVariables from "./util/checkEnvironmentVariables";
-import router from "./endpoints/index";
+import {router} from "./endpoints";
 
 let {NODE_ENV} = process.env,
   nodeEnv = NODE_ENV || "local",

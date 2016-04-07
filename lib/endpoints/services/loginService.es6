@@ -8,14 +8,13 @@ let args = {
 
 export class LoginService {
 
-  constructor(genericRepo,
-              loggerInstance) {
+  constructor(genericRepo, loggerInstance) {
     this.genericRepo_ = genericRepo;
     this.loggerInstance = loggerInstance;
   }
 
   login(req, res) {
-    
+
     args.filter = {"emailId": req.body.emailId,
                    "password": req.body.password};
 
