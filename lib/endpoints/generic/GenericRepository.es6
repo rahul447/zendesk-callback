@@ -113,7 +113,9 @@ export class GenericRepository {
       })
       .then(db => {
         this.loggerInstance.debug("Successfully connected");
-
+        this.loggerInstance.debug(collection);
+        this.loggerInstance.debug(filter);
+        this.loggerInstance.debug(projection);
         return Q.ninvoke(
           db.collection(collection),
           "findOne", filter, projection
