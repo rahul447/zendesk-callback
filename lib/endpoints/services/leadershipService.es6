@@ -8,8 +8,9 @@ let args = {
 
 export class LeaderShipService {
 
-  constructor(genericRepo) {
+  constructor(genericRepo, loggerInstance) {
     this.genericRepo_ = genericRepo;
+    this.loggerInstance = loggerInstance;
   }
 
   getLeadershipDashboard(req, res) {

@@ -1,8 +1,9 @@
 "use strict";
 
 export class EmailService {
-  constructor() {
 
+  constructor(loggerInstance) {
+    this.loggerInstance = loggerInstance;
   }
   sendmail(req, res) {
     res.send("Sending mail");

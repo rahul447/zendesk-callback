@@ -8,8 +8,9 @@ let args = {
 
 export class DrillService {
 
-  constructor(genericRepo) {
+  constructor(genericRepo, loggerInstance) {
     this.genericRepo_ = genericRepo;
+    this.loggerInstance = loggerInstance;
   }
 
   getdrillDashboard(req, res) {

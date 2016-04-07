@@ -15,8 +15,10 @@ export class LoginService {
 
   login(req, res) {
 
-    args.filter = {"emailId": req.body.emailId,
-                   "password": req.body.password};
+    args.filter = {
+      "emailId": req.body.emailId,
+      "password": req.body.password
+    };
 
     this.genericRepo_.retrieve(args)
       .then(result => {

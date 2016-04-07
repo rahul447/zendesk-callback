@@ -22,11 +22,11 @@ let router = express.Router(),
 // leadershipActionableRoute = router.route("/actionable/:id"),
   loginRoute = router.route("/login"),
   genericRepo = getGenericRepoInstance({"config": config, "mongodb": mongodb, "loggerInstance": loggerInstance}),
-  domainService = new DomainService(genericRepo, loggerInstance, mongodb),
+  domainService = new DomainService(genericRepo, loggerInstance),
   loginService = new LoginService(genericRepo, loggerInstance),
-  leadershipService = new LeaderShipService(genericRepo),
-  drillService = new DrillService(genericRepo),
-  emailService = new EmailService();
+  leadershipService = new LeaderShipService(genericRepo, loggerInstance),
+  drillService = new DrillService(genericRepo, loggerInstance),
+  emailService = new EmailService(loggerInstance);
 
 domainRoute
   .get(domainService.getDashboard.bind(domainService));
