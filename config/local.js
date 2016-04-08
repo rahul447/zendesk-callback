@@ -48,7 +48,7 @@ var environmentVariables = require("./environmentVariables"),
     },
     "urlPrefix": "/focus",
     "preferences": {
-      "entitlements": ["x", "y", "z"]
+      "entitlements": ["financial", "y", "z"]
     }
   };
 

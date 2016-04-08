@@ -28,12 +28,12 @@ app.set("port", config.http.port);
 
 // Defines top middleware and routes
 app.use(mwAllowCrossDomain);
-app.use(mwErrorHandler);
 app.use(mwAuthenticate);
 app.use(bodyParser.json());
 app.use("/", router);
 app.use(mwcheckEntitlement);
 app.use(methodOverride);
+app.use(mwErrorHandler);
 
 // Starts the app
 app.listen(app.get("port"), function () {

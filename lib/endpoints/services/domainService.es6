@@ -1,26 +1,21 @@
 "use strict";
 
-import ApiError from "../../util/apiError";
-// import Q from "q";
-// import phantom from "phantom";
-
 let args = {
-  "collection": "users",
+  "collection": "",
   "filter": {},
   "projection": {}
 };
 
-// let sitepage, phInstance = null;
-
 export class DomainService {
 
-  constructor(genericRepo, loggerInstance, mongo, genericService) {
+  constructor(genericRepo, loggerInstance, Q, merge) {
+    this.merge = merge;
     this.genericRepo_ = genericRepo;
     this.loggerInstance = loggerInstance;
-    this.mongo = mongo;
-    this.genericService = genericService;
+    this.Q = Q;
   }
 
+  /*
   validateRequest(req) {
     console.log("===inside validate Request====>");
 
@@ -45,7 +40,46 @@ export class DomainService {
 
     return true;
   }
+*/
 
+  getDomainData(req) {
+    let projection = `dashboard.${req.params.name}`;
+
+    args.collection = "users";
+    args.filter = {"_id": req.userId};
+    args.projection[projection] = 1;
+    console.log(args);
+    return this.genericRepo_.retrieve(args);
+  }
+
+  getDomainPreferences(req) {
+    let projection = `dashboard.${req.params.name}`;
+
+    args.collection = "preferences";
+    args.filter = {"userId": req.userId};
+    // _id in preferences collection indicates preference id. We don't need that.
+    args.projection = {"_id": 0};
+    args.projection[projection] = 1;
+    console.log(args);
+    return this.genericRepo_.retrieve(args);
+  }
+
+  getDomainDashboard(req, res) {
+    console.log(req.params);
+    let content;
+
+    this.Q.all([
+      this.getDomainData(req),
+      this.getDomainPreferences(req)
+    ])
+    .then(response => {
+      content = this.merge(response[0], response[1]);
+      res.send(content);
+    })
+    .done();
+  }
+
+  /*
   getDashboard(req, res) {
 
     let validateReqError = this.validateRequest(req),
@@ -70,26 +104,6 @@ export class DomainService {
         });
     }
   }
+  */
 
-  /* getPDF(req, res) {
-    let html = "<!DOCTYPE html><html><head><title>My Webpage</title></head>" +
-      "<body><h1>My Webpage</h1><p>This is my webpage. I hope you like it" +
-      "!</body></html>";
-
-    phantom.create()
-      .then(instance => {
-        phInstance = instance;
-        return instance.createPage();
-      })
-      .then(page => {
-        sitepage = page;
-        page.content(html);
-      })
-      .then(() => {
-        sitepage.render("test.pdf");
-      })
-      .then(() => {
-        phInstance.exit();
-      });
-  } */
 }
