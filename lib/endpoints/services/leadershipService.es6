@@ -11,7 +11,7 @@ export class LeaderShipService {
   constructor(genericRepo, loggerInstance, Q, merge) {
     this.merge = merge;
     this.genericRepo_ = genericRepo;
-    this.loggerInstance = loggerInstance; 
+    this.loggerInstance = loggerInstance;
     this.Q = Q;
   }
 
