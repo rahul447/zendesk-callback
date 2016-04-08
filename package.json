@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "body-parser": "^1.15.0",
+    "deepmerge": "^0.2.10",
     "express": "^4.13.4",
     "method-override": "^2.3.5",
     "mongodb": "^2.1.7",
