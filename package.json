@@ -26,6 +26,7 @@
     "express": "^4.13.4",
     "method-override": "^2.3.5",
     "mongodb": "^2.1.7",
+    "phantom": "^2.0.10",
     "q": "^1.4.1"
   },
   "devDependencies": {

@@ -5,8 +5,10 @@ import bodyParser from "body-parser";
 import methodOverride from "method-override";
 import mwAllowCrossDomain from "./middleware_services/mwAllowCrossDomain";
 import mwErrorHandler from "./middleware_services/mwErrorHandler";
+import mwAuthenticate from "./middleware_services/mwAuthenticate";
+import mwcheckEntitlement from "./middleware_services/mwcheckEntitlement";
 import checkEnvironmentVariables from "./util/checkEnvironmentVariables";
-import {router} from "./endpoints";
+import {router} from "./endpoints/index";
 
 let {NODE_ENV} = process.env,
   nodeEnv = NODE_ENV || "local",
@@ -15,7 +17,7 @@ let {NODE_ENV} = process.env,
   // urlPrefix = config.urlPrefix,
   environmentVariables = require("../config/environmentVariables");
 
-// Checks the required environment variables
+// Checks the required enviro// Defines top middleware and routesnment variables
 // Logs the missing environment variables and exit the application
 if (config.environmentVariableChecker.isEnabled) {
   checkEnvironmentVariables(environmentVariables);
@@ -26,11 +28,12 @@ app.set("port", config.http.port);
 
 // Defines top middleware and routes
 app.use(mwAllowCrossDomain);
+app.use(mwErrorHandler);
+app.use(mwAuthenticate);
 app.use(bodyParser.json());
 app.use("/", router);
-
+app.use(mwcheckEntitlement);
 app.use(methodOverride);
-app.use(mwErrorHandler);
 
 // Starts the app
 app.listen(app.get("port"), function () {
