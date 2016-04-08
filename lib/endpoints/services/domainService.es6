@@ -1,7 +1,7 @@
 "use strict";
 
 import ApiError from "../../util/apiError";
-import Q from "q";
+// import Q from "q";
 // import phantom from "phantom";
 
 let args = {
