@@ -1,25 +1,49 @@
 "use strict";
 
 let args = {
-  "collection": "users",
+  "collection": "",
   "filter": {},
   "projection": {}
 };
 
 export class LeaderShipService {
 
-  constructor(genericRepo, loggerInstance) {
+  constructor(genericRepo, loggerInstance, Q, merge) {
+    this.merge = merge;
     this.genericRepo_ = genericRepo;
-    this.loggerInstance = loggerInstance;
+    this.loggerInstance = loggerInstance; 
+    this.Q = Q;
+  }
+
+  getLeadershipData(req) {
+    args.collection = "users";
+    args.filter = {"_id": req.params.id};
+    args.projection = {"dashboard.leadership": 1};
+
+    return this.genericRepo_.retrieve(args);
+  }
+
+  getLeadershipPreferences(req) {
+    args.collection = "preferences";
+    args.filter = {"userId": req.params.id};
+    // _id in preferences collection indicates preference id. We don't need that.
+    args.projection = {"dashboard.leadership": 1, "_id": 0};
+
+    return this.genericRepo_.retrieve(args);
   }
 
   getLeadershipDashboard(req, res) {
-    args.filter = {"_id": 1};
-    args.projection = {"dashboard.leadership": 1};
-    this.genericRepo_.retrieve(args)
-      .then(result => {
-        console.log(result);
-        res.send(result);
-      });
+
+    let content;
+
+    this.Q.all([
+      this.getLeadershipData(req),
+      this.getLeadershipPreferences(req)
+    ])
+    .then(response => {
+      content = this.merge(response[0], response[1]);
+      res.send(content);
+    })
+    .done();
   }
 }
