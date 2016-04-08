@@ -46,7 +46,10 @@ var environmentVariables = require("./environmentVariables"),
     "environmentVariableChecker": {
       "isEnabled": false
     },
-    "urlPrefix": "/focus"
+    "urlPrefix": "/focus",
+    "preferences": {
+      "entitlements": ["x", "y", "z"]
+    }
   };
 
 module.exports = config;
