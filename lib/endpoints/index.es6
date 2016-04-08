@@ -1,14 +1,16 @@
 "use strict";
 
+import merge from "deepmerge";
 import express from "express";
-import {LeaderShipService} from "./services/leadershipService";
-import {DrillService} from "./services/drillService";
-import {EmailService} from "./services/emailService";
 import mongodb from "mongodb";
+import Q from "q";
 import loggerInstance from "../util/FocusApiLogger";
 import {getGenericRepoInstance} from "../endpoints/generic/GenericRepository";
 import {DomainService} from "./services/domainService";
 import {getGenericServiceInstance} from "./services/GenericService";
+import {DrillService} from "./services/drillService";
+import {EmailService} from "./services/emailService";
+import {LeaderShipService} from "./services/leadershipService";
 import {LoginService} from "./services/loginService";
 let router = express.Router(),
   {NODE_ENV} = process.env,
@@ -25,7 +27,7 @@ let router = express.Router(),
   genericService = getGenericServiceInstance(genericRepo, loggerInstance, mongodb),
   domainService = new DomainService(genericRepo, loggerInstance, genericService),
   loginService = new LoginService(genericRepo, loggerInstance),
-  leadershipService = new LeaderShipService(genericRepo, loggerInstance),
+  leadershipService = new LeaderShipService(genericRepo, loggerInstance, Q, merge),
   drillService = new DrillService(genericRepo, loggerInstance),
   emailService = new EmailService(loggerInstance);
 
