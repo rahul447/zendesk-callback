@@ -49,7 +49,8 @@ var environmentVariables = require("./environmentVariables"),
     "urlPrefix": "/focus",
     "preferences": {
       "entitlements": ["financial", "y", "z"]
-    }
+    },
+    "publicUrls": ["/login"]
   };
 
 module.exports = config;
