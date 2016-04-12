@@ -6,7 +6,7 @@ function mwAuthenticate(req, res, next) {
     "-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"),
     token = req.headers.authorization.split(" ")[1];
 
-  if (!uniqueIdPattern.test(token)) {
+  if (req.url.indexOf("login") === -1 && !uniqueIdPattern.test(token)) {
     return res.status(401).send("Unauthorized");
   }
 
