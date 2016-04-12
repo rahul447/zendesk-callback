@@ -12,13 +12,13 @@ import {DrillService} from "./services/drillService";
 import {EmailService} from "./services/emailService";
 import {LeaderShipService} from "./services/leadershipService";
 import {LoginService} from "./services/loginService";
+
 let router = express.Router(),
   {NODE_ENV} = process.env,
   nodeEnv = NODE_ENV || "local",
   config = Object.freeze(require("../../config/" + nodeEnv)),
   domainRoute = router.route("/domain/:name"),
-  domainPortletRoute = router.route("/domain/:name/:groupId/:portletId"),
-  gridRoute = router.route("/grid/:Id"),
+  drillRoute = router.route("/domain/:name/:group/:portlet"),
   leadershipRoute = router.route("/leadership"),
   emailRoute = router.route("/sendemail"),
 // leadershipActionableRoute = router.route("/actionable/:id"),
@@ -28,7 +28,7 @@ let router = express.Router(),
   domainService = new DomainService(genericRepo, loggerInstance, Q, merge),
   loginService = new LoginService(genericRepo, loggerInstance),
   leadershipService = new LeaderShipService(genericRepo, loggerInstance, Q, merge),
-  drillService = new DrillService(genericRepo, loggerInstance),
+  drillService = new DrillService(genericRepo, loggerInstance, Q, merge),
   emailService = new EmailService(loggerInstance);
 
 domainRoute
@@ -40,11 +40,8 @@ loginRoute
 leadershipRoute
   .get(leadershipService.getLeadershipDashboard.bind(leadershipService));
 
-domainPortletRoute
-  .get(drillService.getdrillDashboard.bind(drillService));
-
-gridRoute
-  .get(drillService.getdrillgrid.bind(drillService));
+drillRoute
+  .get(drillService.getDrillDashboard.bind(drillService));
 
 emailRoute
   .get(emailService.sendmail.bind(emailService));
