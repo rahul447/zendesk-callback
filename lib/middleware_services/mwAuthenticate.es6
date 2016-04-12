@@ -1,16 +1,18 @@
 "use strict";
-
+import localConfig from "../../config/local";
 function mwAuthenticate(req, res, next) {
   console.log("========mwAuth====================");
   let uniqueIdPattern = new RegExp("^[0-9a-fA-F]{8}" +
-    "-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"),
-    token = req.headers.authorization.split(" ")[1];
+    "-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$");
 
-  if (!uniqueIdPattern.test(token)) {
-    return res.status(401).send("Unauthorized");
+  if (localConfig.publicUrls.indexOf(req.url) === -1 && req.headers.authorization) {
+    let token = req.headers.authorization.split(" ")[1];
+
+    if (!uniqueIdPattern.test(token)) {
+      return res.status(401).send("Unauthorized");
+    }
+    req.userId = token;
   }
-
-  req.userId = token;
 
   next();
 }
