@@ -14,6 +14,9 @@ let protectedGenericInstance,
   docDefinition = {
     "content": [
       {
+        "text": "Tables", "style": "title", "bold": true, "fontSize": 20, "margin": [0, 20, 0, 8]
+      },
+      {
         "style": "tableExample",
         "table": {
           "body": [
@@ -38,10 +41,9 @@ export class GenericService {
   }
 
   generatePDF(req, res) {
-    console.log("=======PDF======================");
     let printer = new PDFDocument(fonts),
       projection = "dashboard.financial.groups.portlets.drillDown",
-      content;
+      content, columnNames, tableRowContent;
 
     repoObj.collection = "users";
     repoObj.filter = {"_id": req.userId};
@@ -50,26 +52,37 @@ export class GenericService {
 
     GenericService.genericRepo.retrieve(repoObj)
       .then(resp => {
-        console.log("================================");
-        content = resp.dashboard.financial.groups[0].portlets[0].drillDown.data;
-        console.log(content);
+        content = resp.dashboard.financial.groups[0].portlets[0].drillDown.data[1];
+        docDefinition.content[0].text = resp.dashboard.financial.groups[0].portlets[0].drillDown.title;
 
-        content.forEach(val => {
-          docDefinition.content[0].body.push(Object.keys(val));
-          docDefinition.content[0].body.push(Object.keys(val).map(key => {
-            return val[key];
-          }));
+        Object.keys(content).map(key => {
+          columnNames = Object.keys(content[key]);
+          tableRowContent = this.generateValueOfObj(content[key]);
+          docDefinition.content[1].table.body.push(tableRowContent);
         });
-        console.log(docDefinition);
-
+        columnNames.shift();
+        docDefinition.content[1].table.body.unshift(columnNames);
+        console.log(JSON.stringify(docDefinition));
         let pdfDoc = printer.createPdfKitDocument(docDefinition);
 
         pdfDoc.pipe(fs.createWriteStream("PDF/tabs.pdf"));
         pdfDoc.end();
 
+        res.status(200).send("Pdf generated successfully");
+
       }, err => {
         res.status(500).send(new ApiError(err, "Database error"));
       });
+  }
+
+  generateValueOfObj(obj) {
+    let valuesArr = [];
+
+    Object.keys(obj).map(key => {
+      valuesArr.push(obj[key]);
+    });
+    valuesArr.shift();
+    return valuesArr;
   }
 }
 
