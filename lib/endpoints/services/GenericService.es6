@@ -2,6 +2,7 @@
 import PDFDocument from "pdfmake/src/printer";
 import ApiError from "../../util/apiError";
 import fs from "fs";
+import Q from "q";
 let protectedGenericInstance,
   fonts = {
     "Roboto": {
@@ -42,6 +43,7 @@ export class GenericService {
 
   generatePDF(req, res) {
     let printer = new PDFDocument(fonts),
+      defer = Q.defer(),
       projection = "dashboard.financial.groups.portlets.drillDown",
       content, columnNames, tableRowContent;
 
@@ -52,7 +54,7 @@ export class GenericService {
 
     GenericService.genericRepo.retrieve(repoObj)
       .then(resp => {
-        content = resp.dashboard.financial.groups[0].portlets[0].drillDown.data[1];
+        content = resp.dashboard.financial.groups[0].portlets[0].drillDown.data;
         docDefinition.content[0].text = resp.dashboard.financial.groups[0].portlets[0].drillDown.title;
 
         Object.keys(content).map(key => {
@@ -68,11 +70,13 @@ export class GenericService {
         pdfDoc.pipe(fs.createWriteStream("PDF/tabs.pdf"));
         pdfDoc.end();
 
-        res.status(200).send("Pdf generated successfully");
-
+        console.log("Pdf generated successfully");
+        defer.resolve(res);
       }, err => {
-        res.status(500).send(new ApiError(err, "Database error"));
+        defer.reject(new ApiError(err, "Database error"));
       });
+
+    return defer.promise;
   }
 
   generateValueOfObj(obj) {
