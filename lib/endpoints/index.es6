@@ -25,6 +25,9 @@ let router = express.Router(),
   leadershipRoute = router.route("/leadership"),
   emailRoute = router.route("/sendmail"),
   pdfRoute = router.route("/download"),
+  getAction = router.route("/getAll"),
+  removeAction = router.route("/remove/:id"),
+// leadershipActionableRoute = router.route("/actionable/:id"),
   loginRoute = router.route("/login"),
   genericRepo = getGenericRepoInstance({"config": config, "mongodb": mongodb, "loggerInstance": loggerInstance}),
   genericService = getGenericServiceInstance(genericRepo, loggerInstance, mongodb),
@@ -51,6 +54,13 @@ drillRoute
 emailRoute
   .get(emailService.sendmail.bind(emailService));
 
-pdfRoute.get(genericService.generatePDF.bind(genericService));
+pdfRoute
+  .get(genericService.generatePDF.bind(genericService));
+
+getAction
+  .get(genericService.getAll.bind(genericService));
+
+removeAction
+  .get(genericService.deleteRecord.bind(genericService));
 
 export {router};

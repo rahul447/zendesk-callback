@@ -6,6 +6,7 @@ function mwAuthenticate(req, res, next) {
     "-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$");
 
   if (localConfig.publicUrls.indexOf(req.url) === -1 && req.headers.authorization) {
+    console.log("no not here");
     let token = req.headers.authorization.split(" ")[1];
 
     if (!uniqueIdPattern.test(token)) {
@@ -13,6 +14,7 @@ function mwAuthenticate(req, res, next) {
     }
     req.userId = token;
   }
+  console.log("yes");
 
   next();
 }

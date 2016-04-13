@@ -126,6 +126,52 @@ export class GenericRepository {
         return findResult;
       });
   }
+
+  getData(query) {
+    let {createdDate, limit} = query;
+
+    this.loggerInstance.info("Retreiving from db");
+
+    return this.db_
+      .catch(err => {
+        this.loggerInstance.debug("Connection to db is broken at create: ", err);
+        return this.connectToDb_();
+      })
+      .then(db => {
+        this.loggerInstance.debug("Successfully connected");
+        return Q.ninvoke(db.collection("actionables"), "find", {});
+      })
+      .then(findResult => {
+        return findResult.sort({"createdDate": createdDate}).limit(limit).toArray();
+      });
+  }
+
+  removeRecord(params) {
+    let {collection, filter, limit} = params;
+
+    this.loggerInstance.info("Removing record from db having id");
+
+    return this.db_
+      .catch(err => {
+        this.loggerInstance.debug("Connection to db is broken at create: ", err);
+        return this.connectToDb_();
+      })
+      .then(db => {
+        this.loggerInstance.debug("Successfully connected");
+        return Q.ninvoke(
+          db.collection(collection), "remove", filter)
+          .then(res => {
+            console.log("success", res);
+            return this.getData({
+              "createdDate": 1,
+              "limit": limit
+            });
+          }, err => {
+            console.log("error after remove", err);
+            return err;
+          });
+      });
+  }
 }
 
 export function getGenericRepoInstance(args) {
