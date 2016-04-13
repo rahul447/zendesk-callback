@@ -12,7 +12,8 @@ import {DrillService} from "./services/drillService";
 import {EmailService} from "./services/emailService";
 import {LeaderShipService} from "./services/leadershipService";
 import {LoginService} from "./services/loginService";
-
+import {getGenericServiceInstance} from "./services/GenericService";
+import mwcheckEntitlement from "../middleware_services/mwcheckEntitlement";
 let router = express.Router(),
   {NODE_ENV} = process.env,
   nodeEnv = NODE_ENV || "local",
@@ -21,10 +22,11 @@ let router = express.Router(),
   drillRoute = router.route("/domain/:name/:group/:portlet"),
   leadershipRoute = router.route("/leadership"),
   emailRoute = router.route("/sendemail"),
+  pdfRoute = router.route("/download"),
 // leadershipActionableRoute = router.route("/actionable/:id"),
   loginRoute = router.route("/login"),
   genericRepo = getGenericRepoInstance({"config": config, "mongodb": mongodb, "loggerInstance": loggerInstance}),
-  // genericService = getGenericServiceInstance(genericRepo, loggerInstance, mongodb),
+  genericService = getGenericServiceInstance(genericRepo, loggerInstance, mongodb),
   domainService = new DomainService(genericRepo, loggerInstance, Q, merge),
   loginService = new LoginService(genericRepo, loggerInstance),
   leadershipService = new LeaderShipService(genericRepo, loggerInstance, Q, merge),
@@ -32,6 +34,7 @@ let router = express.Router(),
   emailService = new EmailService(loggerInstance);
 
 domainRoute
+  .get(mwcheckEntitlement)
   .get(domainService.getDomainDashboard.bind(domainService));
 
 loginRoute
@@ -45,5 +48,7 @@ drillRoute
 
 emailRoute
   .get(emailService.sendmail.bind(emailService));
+
+pdfRoute.get(genericService.generatePDF.bind(genericService));
 
 export {router};

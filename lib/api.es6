@@ -6,7 +6,6 @@ import methodOverride from "method-override";
 import mwAllowCrossDomain from "./middleware_services/mwAllowCrossDomain";
 import mwErrorHandler from "./middleware_services/mwErrorHandler";
 import mwAuthenticate from "./middleware_services/mwAuthenticate";
-import mwcheckEntitlement from "./middleware_services/mwcheckEntitlement";
 import checkEnvironmentVariables from "./util/checkEnvironmentVariables";
 import {router} from "./endpoints/index";
 
@@ -29,9 +28,9 @@ app.set("port", config.http.port);
 // Defines top middleware and routes
 app.use(mwAllowCrossDomain);
 app.use(mwAuthenticate);
+// app.use(mwcheckEntitlement);
 app.use(bodyParser.json());
 app.use("/", router);
-app.use(mwcheckEntitlement);
 app.use(methodOverride);
 app.use(mwErrorHandler);
 
