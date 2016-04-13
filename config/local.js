@@ -58,7 +58,6 @@ var environmentVariables = require("./environmentVariables"),
         "user": "mdoffice@cantahealth.com",
         "pass": "Password@123"
       }
-    }
   };
 
 module.exports = config;
