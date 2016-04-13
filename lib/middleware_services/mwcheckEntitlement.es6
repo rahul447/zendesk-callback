@@ -7,7 +7,6 @@ function mwcheckEntitlement(req, res, next) {
   console.log(req.params);
   console.log(localConfig.preferences.entitlements);
   if (localConfig.preferences.entitlements.indexOf(req.params.name) !== -1) {
-    console.log("=============================================");
     return next();
   }
   return next(new ApiError("entitlement"));

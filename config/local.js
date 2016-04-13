@@ -50,7 +50,15 @@ var environmentVariables = require("./environmentVariables"),
     "preferences": {
       "entitlements": ["financial", "y", "z"]
     },
-    "publicUrls": ["/login"]
+    "publicUrls": ["/login"],
+    "smtp": {
+      "host": "smtp.apptixemail.net",
+      "port": 587,
+      "auth": {
+        "user": "mdoffice@cantahealth.com",
+        "pass": "Password@123"
+      }
+    }
   };
 
 module.exports = config;
