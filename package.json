@@ -24,6 +24,8 @@
   "dependencies": {
     "babel-polyfill": "^6.7.4",
     "body-parser": "^1.15.0",
+    "ch-logger": "^1.0.0",
+    "ch-nodemailer": "^1.1.0",
     "deepmerge": "^0.2.10",
     "express": "^4.13.4",
     "method-override": "^2.3.5",

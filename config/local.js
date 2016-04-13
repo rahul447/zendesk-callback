@@ -41,7 +41,7 @@ var environmentVariables = require("./environmentVariables"),
     "caching": {
       "host": environmentVariables.FOCUS_REDIS_HOST,
       "port": environmentVariables.FOCUS_REDIS_PORT,
-      "ttl": 24*60*60
+      "ttl": 24 * 60 * 60
     },
     "environmentVariableChecker": {
       "isEnabled": false
@@ -58,6 +58,7 @@ var environmentVariables = require("./environmentVariables"),
         "user": "mdoffice@cantahealth.com",
         "pass": "Password@123"
       }
+    }
   };
 
 module.exports = config;

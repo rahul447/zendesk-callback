@@ -17,7 +17,7 @@ export class LeaderShipService {
 
   getLeadershipData(req) {
     args.collection = "users";
-    args.filter = {"_id": req.params.id};
+    args.filter = {"_id": req.userId};
     args.projection = {"dashboard.leadership": 1};
 
     return this.genericRepo_.retrieve(args);
@@ -25,7 +25,7 @@ export class LeaderShipService {
 
   getLeadershipPreferences(req) {
     args.collection = "preferences";
-    args.filter = {"userId": req.params.id};
+    args.filter = {"userId": req.userId};
     // _id in preferences collection indicates preference id. We don't need that.
     args.projection = {"dashboard.leadership": 1, "_id": 0};
 

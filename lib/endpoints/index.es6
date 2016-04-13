@@ -8,7 +8,6 @@ import crypto from "crypto";
 import loggerInstance from "../util/FocusApiLogger";
 import {getGenericRepoInstance} from "../endpoints/generic/GenericRepository";
 import {DomainService} from "./services/domainService";
-// import {getGenericServiceInstance} from "./services/GenericService";
 import {DrillService} from "./services/drillService";
 import {EmailService} from "./services/emailService";
 import {LeaderShipService} from "./services/leadershipService";
@@ -16,6 +15,7 @@ import {LoginService} from "./services/loginService";
 import {getGenericServiceInstance} from "./services/GenericService";
 import mwcheckEntitlement from "../middleware_services/mwcheckEntitlement";
 import NodeMailer from "ch-nodemailer";
+
 let router = express.Router(),
   {NODE_ENV} = process.env,
   nodeEnv = NODE_ENV || "local",
@@ -25,7 +25,6 @@ let router = express.Router(),
   leadershipRoute = router.route("/leadership"),
   emailRoute = router.route("/sendmail"),
   pdfRoute = router.route("/download"),
-// leadershipActionableRoute = router.route("/actionable/:id"),
   loginRoute = router.route("/login"),
   genericRepo = getGenericRepoInstance({"config": config, "mongodb": mongodb, "loggerInstance": loggerInstance}),
   genericService = getGenericServiceInstance(genericRepo, loggerInstance, mongodb),
