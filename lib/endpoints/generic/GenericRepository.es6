@@ -128,7 +128,30 @@ export class GenericRepository {
   }
 
   getData(query) {
-    let {createdDate, limit} = query;
+    let {collection, limit} = query,
+      aggregateObj = [
+        {
+          "$group": {
+            "_id": {
+              "col": "$col", "text": "$text", "createdDate": "$createdDate"
+            }, "count": {
+              "$sum": 1
+            }
+          }
+        },
+        {
+          "$group": {
+            "_id": "$_id.col", "data": {
+              "$push": {
+                "text": "$_id.text", "createdDate": "$_id.createdDate"
+              }
+            }
+          }
+        },
+        {
+          "$limit": limit
+        }
+      ];
 
     this.loggerInstance.info("Retreiving from db");
 
@@ -139,10 +162,10 @@ export class GenericRepository {
       })
       .then(db => {
         this.loggerInstance.debug("Successfully connected");
-        return Q.ninvoke(db.collection("actionables"), "find", {});
+        return Q.ninvoke(db.collection(collection), "aggregate", aggregateObj);
       })
       .then(findResult => {
-        return findResult.sort({"createdDate": createdDate}).limit(limit).toArray();
+        return findResult;
       });
   }
 
@@ -158,12 +181,12 @@ export class GenericRepository {
       })
       .then(db => {
         this.loggerInstance.debug("Successfully connected");
+        console.log(filter);
         return Q.ninvoke(
           db.collection(collection), "remove", filter)
-          .then(res => {
-            console.log("success", res);
+          .then(() => {
             return this.getData({
-              "createdDate": 1,
+              "collection": "actionables",
               "limit": limit
             });
           }, err => {

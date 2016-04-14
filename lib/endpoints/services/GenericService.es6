@@ -100,8 +100,7 @@ export class GenericService {
     repoObj.limit = 5;
     GenericService.genericRepo.getData(repoObj)
       .then(resp => {
-        console.log("data==>", resp);
-        // this.loggerInstance.info("GenericService success after retrieve call");
+        GenericService.loggerInstance.info("GenericService success after retrieve call");
         res.status(200).send(resp);
       }, err => {
         this.loggerInstance.info("GenericService fail after retreive call");
