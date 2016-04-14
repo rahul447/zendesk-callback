@@ -133,7 +133,7 @@ export class GenericRepository {
         {
           "$group": {
             "_id": {
-              "col": "$col", "text": "$text", "createdDate": "$createdDate"
+              "col": "$col", "text": "$text", "createdDate": "$createdDate", "id": "$_id"
             }, "count": {
               "$sum": 1
             }
@@ -143,7 +143,7 @@ export class GenericRepository {
           "$group": {
             "_id": "$_id.col", "data": {
               "$push": {
-                "text": "$_id.text", "createdDate": "$_id.createdDate"
+                "text": "$_id.text", "createdDate": "$_id.createdDate", "id": "$_id.id"
               }
             }
           }
