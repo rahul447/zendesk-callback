@@ -21,7 +21,6 @@ let protectedGenericInstance,
         "style": "tableExample",
         "table": {
           "body": [
-
           ]
         }
       }
@@ -44,7 +43,7 @@ export class GenericService {
   generatePDF(req, res) {
     let printer = new PDFDocument(fonts),
       defer = Q.defer(),
-      projection = "dashboard.financial.groups.portlets.drillDown",
+      projection = `dashboard.${req.body.domain}.groups.portlets.drillDown.data`,
       content, columnNames, tableRowContent;
 
     repoObj.collection = "users";
@@ -54,7 +53,7 @@ export class GenericService {
 
     GenericService.genericRepo.retrieve(repoObj)
       .then(resp => {
-        content = resp.dashboard.financial.groups[0].portlets[0].drillDown.data;
+        content = resp.dashboard[req.body.domain].groups[0].portlets[0].drillDown.data;
         docDefinition.content[0].text = resp.dashboard.financial.groups[0].portlets[0].drillDown.title;
 
         Object.keys(content).map(key => {
@@ -67,10 +66,13 @@ export class GenericService {
         console.log(JSON.stringify(docDefinition));
         let pdfDoc = printer.createPdfKitDocument(docDefinition);
 
-        pdfDoc.pipe(fs.createWriteStream("PDF/tabs.pdf"));
+        pdfDoc.pipe(fs.createWriteStream("PDF/testMail.pdf"));
         pdfDoc.end();
-
         console.log("Pdf generated successfully");
+
+        const getUserData = this.getUserPreference(req);
+
+        res.portletName = getUserData.dashboard[req.body.domain].groups[0].portlets[0].component.options.title;
         defer.resolve(res);
       }, err => {
         defer.reject(new ApiError(err, "Database error"));
@@ -124,6 +126,17 @@ export class GenericService {
         GenericService.loggerInstance.info("GenericService fail after remove call");
         res.status(400).send(err);
       });
+  }
+
+  getUserPreference(req) {
+    let projection = "dashboard.financial.groups.portlets.component.options";
+
+    repoObj.collection = "preferences";
+    repoObj.filter = {"_id": req.userId};
+    repoObj.projection[projection] = 1;
+    console.log(repoObj);
+
+    return GenericService.genericRepo.retrieve(repoObj);
   }
 }
 

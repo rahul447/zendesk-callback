@@ -52,7 +52,7 @@ drillRoute
   .get(drillService.getDrillDashboard.bind(drillService));
 
 emailRoute
-  .get(emailService.sendmail.bind(emailService));
+  .post(emailService.sendmail.bind(emailService));
 
 pdfRoute
   .get(genericService.generatePDF.bind(genericService));

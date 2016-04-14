@@ -9,19 +9,22 @@ export class EmailService {
   }
   sendmail(req, res) {
     let mailOption = {
-      "to": "shaileshs@cantahealth.com",
-      "from": "mdoffice@cantahealth.com",
-      "subject": "First Mail with attachement",
+      "to": req.body.to,
+      "from": "info@cantahealth.com",
       "text": "Hello MDOffice",
-      "html": "<h1>CantaHealth Test Mail</h1>",
+      "html": "<footer>The data displayed in this email is a result of a drill down from a dashboard. Please do not " +
+      "reply to this e-mail, as it was sent from an unattended e-mail address. For any query or clarification please " +
+      "feel free to contact info@cantahealth.com</footer>",
       "attachments": [{
         "file": "tabs.pdf",
-        "path": "PDF/tabs.pdf"
+        "path": "PDF/testMail.pdf"
       }]
     };
 
     this.genericService.generatePDF(req, res)
-      .then(() => {
+      .then(response => {
+        mailOption.subject = `Focus email for ${req.body.domain} drilldown ${response.portletName}
+        for user ${req.body.emailId}`;
         this.Nodemailer.send(mailOption)
           .then(resp => {
             console.log("Mail sent Successfully");
