@@ -88,6 +88,43 @@ export class GenericService {
     valuesArr.shift();
     return valuesArr;
   }
+
+  getAll(req, res) {
+    console.log("GenericService getAll call");
+    GenericService.loggerInstance.info("GenericService getAll call");
+    repoObj.collection = "actionables";
+    repoObj.filter = {
+      "_id": req.userId
+    };
+    repoObj.createdDate = 1;
+    repoObj.limit = 5;
+    GenericService.genericRepo.getData(repoObj)
+      .then(resp => {
+        GenericService.loggerInstance.info("GenericService success after retrieve call");
+        res.status(200).send(resp);
+      }, err => {
+        this.loggerInstance.info("GenericService fail after retreive call");
+        res.status(400).send(err);
+      })
+      .done();
+  }
+
+  deleteRecord(req, res) {
+    GenericService.loggerInstance.info("GenericService delete record call");
+    repoObj.collection = "actionables";
+    repoObj.filter = {
+      "_id": req.params.id
+    };
+    repoObj.limit = 5;
+    GenericService.genericRepo.removeRecord(repoObj)
+      .then(resp => {
+        GenericService.loggerInstance.info("GenericService success after remove call");
+        res.status(200).send(resp);
+      }, err => {
+        GenericService.loggerInstance.info("GenericService fail after remove call");
+        res.status(400).send(err);
+      });
+  }
 }
 
 export function getGenericServiceInstance(...args) {

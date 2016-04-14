@@ -126,6 +126,75 @@ export class GenericRepository {
         return findResult;
       });
   }
+
+  getData(query) {
+    let {collection, limit} = query,
+      aggregateObj = [
+        {
+          "$group": {
+            "_id": {
+              "col": "$col", "text": "$text", "createdDate": "$createdDate"
+            }, "count": {
+              "$sum": 1
+            }
+          }
+        },
+        {
+          "$group": {
+            "_id": "$_id.col", "data": {
+              "$push": {
+                "text": "$_id.text", "createdDate": "$_id.createdDate"
+              }
+            }
+          }
+        },
+        {
+          "$limit": limit
+        }
+      ];
+
+    this.loggerInstance.info("Retreiving from db");
+
+    return this.db_
+      .catch(err => {
+        this.loggerInstance.debug("Connection to db is broken at create: ", err);
+        return this.connectToDb_();
+      })
+      .then(db => {
+        this.loggerInstance.debug("Successfully connected");
+        return Q.ninvoke(db.collection(collection), "aggregate", aggregateObj);
+      })
+      .then(findResult => {
+        return findResult;
+      });
+  }
+
+  removeRecord(params) {
+    let {collection, filter, limit} = params;
+
+    this.loggerInstance.info("Removing record from db having id");
+
+    return this.db_
+      .catch(err => {
+        this.loggerInstance.debug("Connection to db is broken at create: ", err);
+        return this.connectToDb_();
+      })
+      .then(db => {
+        this.loggerInstance.debug("Successfully connected");
+        console.log(filter);
+        return Q.ninvoke(
+          db.collection(collection), "remove", filter)
+          .then(() => {
+            return this.getData({
+              "collection": "actionables",
+              "limit": limit
+            });
+          }, err => {
+            console.log("error after remove", err);
+            return err;
+          });
+      });
+  }
 }
 
 export function getGenericRepoInstance(args) {
