@@ -170,7 +170,7 @@ export class GenericRepository {
   }
 
   removeRecord(params) {
-    let {collection, filter, limit, col} = params;
+    let {collection, filter, limit} = params;
 
     this.loggerInstance.info("Removing record from db having id");
 
@@ -185,10 +185,9 @@ export class GenericRepository {
         return Q.ninvoke(
           db.collection(collection), "remove", filter)
           .then(() => {
-            return this.getDataAfterRemove({
+            return this.getData({
               "collection": "actionables",
-              "limit": limit,
-              "col": col
+              "limit": limit
             });
           }, err => {
             console.log("error after remove", err);
@@ -197,7 +196,7 @@ export class GenericRepository {
       });
   }
 
-  getDataAfterRemove(params) {
+  /* getDataAfterRemove(params) {
     let {collection, limit, col} = params,
       aggregateObj = [
         {
@@ -240,7 +239,7 @@ export class GenericRepository {
       .then(findResult => {
         return findResult;
       });
-  }
+  } */
 }
 
 export function getGenericRepoInstance(args) {

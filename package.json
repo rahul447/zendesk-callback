@@ -33,7 +33,8 @@
     "pdfkit": "^0.7.2",
     "pdfmake": "git://github.com/bpampuch/pdfmake.git",
     "phantom": "^2.0.10",
-    "q": "^1.4.1"
+    "q": "^1.4.1",
+    "request": "^2.69.0"
   },
   "devDependencies": {
     "babel-eslint": "^5.0.0",
