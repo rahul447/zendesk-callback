@@ -58,6 +58,14 @@ var environmentVariables = require("./environmentVariables"),
         "user": "mdoffice@cantahealth.com",
         "pass": "Password@123"
       }
+    },
+    "fhirValidator": {
+      "baseURI": {
+        "protocol": "http",
+        "domain": "10.18.6.113",
+        "port": 8050,
+        "version": "baseDstu2"
+      }
     }
   };
 

@@ -10,11 +10,12 @@ export class EmailService {
   sendmail(req, res) {
     let mailOption = {
       "to": req.body.to,
-      "from": "info@cantahealth.com",
+      "from": "mdoffice@cantahealth.com",
       "text": "Hello MDOffice",
-      "html": "<footer>The data displayed in this email is a result of a drill down from a dashboard. Please do not " +
-      "reply to this e-mail, as it was sent from an unattended e-mail address. For any query or clarification please " +
-      "feel free to contact info@cantahealth.com</footer>",
+      "html": `<footer>
+      The data displayed in this email is the result of drill down from ${req.body.domain} dashboard.Please do not reply
+       to this e-mail, as it was sent from an unattended e-mail address. For any query or clarification please feel free
+        to contact info@cantahealth.com</footer>`,
       "attachments": [{
         "file": "testMail.pdf",
         "path": "PDF/testMail.pdf"

@@ -27,10 +27,11 @@ let router = express.Router(),
   pdfRoute = router.route("/download"),
   getAction = router.route("/getAll"),
   removeAction = router.route("/remove/:id"),
+  fhirValidateRoute = router.route("/validate/:endpoint/:id"),
 // leadershipActionableRoute = router.route("/actionable/:id"),
   loginRoute = router.route("/login"),
   genericRepo = getGenericRepoInstance({"config": config, "mongodb": mongodb, "loggerInstance": loggerInstance}),
-  genericService = getGenericServiceInstance(genericRepo, loggerInstance, mongodb),
+  genericService = getGenericServiceInstance(genericRepo, loggerInstance, mongodb, config),
   domainService = new DomainService(genericRepo, loggerInstance, Q, merge),
   loginService = new LoginService(genericRepo, loggerInstance, crypto),
   leadershipService = new LeaderShipService(genericRepo, loggerInstance, Q, merge),
@@ -62,5 +63,8 @@ getAction
 
 removeAction
   .get(genericService.deleteRecord.bind(genericService));
+
+fhirValidateRoute
+  .get(genericService.validateRecord.bind(genericService));
 
 export {router};

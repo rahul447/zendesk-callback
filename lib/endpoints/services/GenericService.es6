@@ -3,6 +3,7 @@ import PDFDocument from "pdfmake/src/printer";
 import ApiError from "../../util/apiError";
 import fs from "fs";
 import Q from "q";
+import request from "request";
 let protectedGenericInstance,
   fonts = {
     "Roboto": {
@@ -75,10 +76,11 @@ let protectedGenericInstance,
 
 export class GenericService {
 
-  constructor(genericRepo, loggerInstance, mongo) {
+  constructor(genericRepo, loggerInstance, mongo, config) {
     GenericService.genericRepo = genericRepo;
     GenericService.loggerInstance = loggerInstance;
     GenericService.mongo = mongo;
+    GenericService.config = config;
   }
 
   generatePDF(req, res) {
@@ -163,6 +165,38 @@ export class GenericService {
         GenericService.loggerInstance.info("GenericService fail after remove call");
         res.status(400).send(err);
       });
+  }
+
+  validateRecord(req, res) {
+    GenericService.loggerInstance.info("Generic schema validation");
+    const url = `${
+      GenericService.config.fhirValidator.baseURI.protocol
+      }://${
+      GenericService.config.fhirValidator.baseURI.domain
+      }:${
+      GenericService.config.fhirValidator.baseURI.port
+      }/fhir/v1/${
+      req.params.endpoint
+      }/${
+      req.params.id
+      }`,
+      options = {
+        "url": url,
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      };
+
+    request.get(options, (err, xhp, body) => {
+      if (err) {
+        GenericService.loggerInstance.debug("Error received:", err);
+        res.status(400).send(err);
+      } else {
+        GenericService.loggerInstance.debug("DONE: ", body);
+        res.status(200).send(body);
+      }
+    });
+
   }
 
   /* getUserPreference(req) {
