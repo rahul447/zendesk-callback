@@ -62,7 +62,7 @@ getAction
   .get(genericService.getAll.bind(genericService));
 
 removeAction
-  .get(genericService.deleteRecord.bind(genericService));
+  .post(genericService.deleteRecord.bind(genericService));
 
 fhirValidateRoute
   .get(genericService.validateRecord.bind(genericService));
