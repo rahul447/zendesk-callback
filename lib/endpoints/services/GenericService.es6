@@ -193,7 +193,7 @@ export class GenericService {
         res.status(400).send(err);
       } else {
         GenericService.loggerInstance.debug("DONE: ", body);
-        res.status(200).send(body);
+        res.status(200).send(JSON.parse(body));
       }
     });
 
