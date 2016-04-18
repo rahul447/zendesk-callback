@@ -170,7 +170,7 @@ export class GenericRepository {
   }
 
   removeRecord(params) {
-    let {collection, filter, limit} = params;
+    let {collection, filter, limit, col} = params;
 
     this.loggerInstance.info("Removing record from db having id");
 
@@ -185,14 +185,60 @@ export class GenericRepository {
         return Q.ninvoke(
           db.collection(collection), "remove", filter)
           .then(() => {
-            return this.getData({
+            return this.getDataAfterRemove({
               "collection": "actionables",
-              "limit": limit
+              "limit": limit,
+              "col": col
             });
           }, err => {
             console.log("error after remove", err);
             return err;
           });
+      });
+  }
+
+  getDataAfterRemove(params) {
+    let {collection, limit, col} = params,
+      aggregateObj = [
+        {
+          "$match": {"col": col}
+        },
+        {
+          "$group": {
+            "_id": {
+              "col": "$col", "text": "$text", "createdDate": "$createdDate", "id": "$_id"
+            }, "count": {
+              "$sum": 1
+            }
+          }
+        },
+        {
+          "$group": {
+            "_id": "$_id.col", "data": {
+              "$push": {
+                "text": "$_id.text", "createdDate": "$_id.createdDate", "id": "$_id.id"
+              }
+            }
+          }
+        },
+        {
+          "$limit": limit
+        }
+      ];
+
+    this.loggerInstance.info("Retreiving from db");
+
+    return this.db_
+      .catch(err => {
+        this.loggerInstance.debug("Connection to db is broken at create: ", err);
+        return this.connectToDb_();
+      })
+      .then(db => {
+        this.loggerInstance.debug("Successfully connected");
+        return Q.ninvoke(db.collection(collection), "aggregate", aggregateObj);
+      })
+      .then(findResult => {
+        return findResult;
       });
   }
 }

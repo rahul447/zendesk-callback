@@ -15,13 +15,57 @@ let protectedGenericInstance,
   docDefinition = {
     "content": [
       {
+        "text": "Tables", "style": "title"
+      },
+      {
         "style": "tableExample",
         "table": {
           "body": [
           ]
+        },
+        "layout": {
+          hLineWidth(i, node) {
+            return (i === 0 || i === node.table.body.length) ? 2 : 1;
+          },
+          vLineWidth(i, node) {
+            return (i === 0 || i === node.table.widths.length) ? 2 : 1;
+          },
+          hLineColor(i, node) {
+            return (i === 0 || i === node.table.body.length) ? "black" : "gray";
+          },
+          vLineColor(i, node) {
+            return (i === 0 || i === node.table.widths.length) ? "black" : "gray";
+          }
+          // paddingLeft: function(i, node) { return 4; },
+          // paddingRight: function(i, node) { return 4; },
+          // paddingTop: function(i, node) { return 2; },
+          // paddingBottom: function(i, node) { return 2; }
         }
       }
-    ]
+    ],
+    "styles": {
+      "header": {
+        "fontSize": 18,
+        "bold": true,
+        "margin": [0, 0, 0, 10]
+      },
+      "subheader": {
+        "fontSize": 16,
+        "bold": true,
+        "margin": [0, 10, 0, 5]
+      },
+      "tableExample": {
+        "margin": [0, 5, 0, 15]
+      },
+      "tableHeader": {
+        "bold": true,
+        "fontSize": 13,
+        "color": "black"
+      }
+    },
+    "defaultStyle": {
+      // alignment: 'justify'
+    }
   },
   repoObj = {
     "collection": "",
@@ -51,19 +95,17 @@ export class GenericService {
     GenericService.genericRepo.retrieve(repoObj)
       .then(resp => {
         content = resp.dashboard[req.body.domain].groups[0].portlets[0].drillDown.data;
-        // docDefinition.content[0].text = resp.dashboard.financial.groups[0].portlets[0].drillDown.title;
-
         Object.keys(content).map(key => {
           columnNames = Object.keys(content[key]);
           tableRowContent = this.generateValueOfObj(content[key]);
-          docDefinition.content[0].table.body.push(tableRowContent);
+          docDefinition.content[1].table.body.push(tableRowContent);
         });
         columnNames.shift();
-        docDefinition.content[0].table.body.unshift(columnNames);
+        docDefinition.content[1].table.body.unshift(columnNames);
         console.log(JSON.stringify(docDefinition));
         let pdfDoc = printer.createPdfKitDocument(docDefinition);
 
-        pdfDoc.pipe(fs.createWriteStream("PDF/tab.pdf"));
+        pdfDoc.pipe(fs.createWriteStream("PDF/testMail.pdf"));
         pdfDoc.end();
         console.log("Pdf generated successfully");
 
@@ -112,6 +154,7 @@ export class GenericService {
       "_id": req.params.id
     };
     repoObj.limit = 5;
+    repoObj.col = req.body.col;
     GenericService.genericRepo.removeRecord(repoObj)
       .then(resp => {
         GenericService.loggerInstance.info("GenericService success after remove call");

@@ -16,7 +16,7 @@ export class EmailService {
       "reply to this e-mail, as it was sent from an unattended e-mail address. For any query or clarification please " +
       "feel free to contact info@cantahealth.com</footer>",
       "attachments": [{
-        "file": "tabs.pdf",
+        "file": "testMail.pdf",
         "path": "PDF/testMail.pdf"
       }]
     };
