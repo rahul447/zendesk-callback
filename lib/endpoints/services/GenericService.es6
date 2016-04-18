@@ -15,9 +15,6 @@ let protectedGenericInstance,
   docDefinition = {
     "content": [
       {
-        "text": "Tables", "style": "title", "bold": true, "fontSize": 20, "margin": [0, 20, 0, 8]
-      },
-      {
         "style": "tableExample",
         "table": {
           "body": [
@@ -54,25 +51,22 @@ export class GenericService {
     GenericService.genericRepo.retrieve(repoObj)
       .then(resp => {
         content = resp.dashboard[req.body.domain].groups[0].portlets[0].drillDown.data;
-        docDefinition.content[0].text = resp.dashboard.financial.groups[0].portlets[0].drillDown.title;
+        // docDefinition.content[0].text = resp.dashboard.financial.groups[0].portlets[0].drillDown.title;
 
         Object.keys(content).map(key => {
           columnNames = Object.keys(content[key]);
           tableRowContent = this.generateValueOfObj(content[key]);
-          docDefinition.content[1].table.body.push(tableRowContent);
+          docDefinition.content[0].table.body.push(tableRowContent);
         });
         columnNames.shift();
-        docDefinition.content[1].table.body.unshift(columnNames);
+        docDefinition.content[0].table.body.unshift(columnNames);
         console.log(JSON.stringify(docDefinition));
         let pdfDoc = printer.createPdfKitDocument(docDefinition);
 
-        pdfDoc.pipe(fs.createWriteStream("PDF/testMail.pdf"));
+        pdfDoc.pipe(fs.createWriteStream("PDF/tab.pdf"));
         pdfDoc.end();
         console.log("Pdf generated successfully");
 
-        const getUserData = this.getUserPreference(req);
-
-        res.portletName = getUserData.dashboard[req.body.domain].groups[0].portlets[0].component.options.title;
         defer.resolve(res);
       }, err => {
         defer.reject(new ApiError(err, "Database error"));
@@ -128,7 +122,7 @@ export class GenericService {
       });
   }
 
-  getUserPreference(req) {
+  /* getUserPreference(req) {
     let projection = "dashboard.financial.groups.portlets.component.options";
 
     repoObj.collection = "preferences";
@@ -137,7 +131,7 @@ export class GenericService {
     console.log(repoObj);
 
     return GenericService.genericRepo.retrieve(repoObj);
-  }
+  } */
 }
 
 export function getGenericServiceInstance(...args) {

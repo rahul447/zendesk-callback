@@ -22,9 +22,8 @@ export class EmailService {
     };
 
     this.genericService.generatePDF(req, res)
-      .then(response => {
-        mailOption.subject = `Focus email for ${req.body.domain} drilldown ${response.portletName}
-        for user ${req.body.emailId}`;
+      .then(() => {
+        mailOption.subject = `Focus email for ${req.body.domain} drilldown for user ${req.body.emailId}`;
         this.Nodemailer.send(mailOption)
           .then(resp => {
             console.log("Mail sent Successfully");
