@@ -23,7 +23,7 @@ export class LoginService {
 
     args.collection = "accounts";
     args.filter = {
-      "emailID": req.body.emailId,
+      "emailID": req.body.emailID,
       "password": encryptedPassword
     };
     args.projection = {
