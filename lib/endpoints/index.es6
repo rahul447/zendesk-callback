@@ -13,7 +13,7 @@ import {EmailService} from "./services/emailService";
 import {LeaderShipService} from "./services/leadershipService";
 import {LoginService} from "./services/loginService";
 import {getGenericServiceInstance} from "./services/GenericService";
-import mwcheckEntitlement from "../middleware_services/mwcheckEntitlement";
+import {getEntitlementInstance} from "../middleware_services/mwcheckEntitlement";
 import NodeMailer from "ch-nodemailer";
 
 let router = express.Router(),
@@ -37,10 +37,11 @@ let router = express.Router(),
   leadershipService = new LeaderShipService(genericRepo, loggerInstance, Q, merge),
   drillService = new DrillService(genericRepo, loggerInstance, Q, merge),
   nodeMailerInstance = new NodeMailer(config.smtp),
+  entitlementInstance = getEntitlementInstance(genericRepo, loggerInstance),
   emailService = new EmailService(loggerInstance, genericService, nodeMailerInstance);
 
 domainRoute
-  .get(mwcheckEntitlement)
+  .get(entitlementInstance.getEntitlements.bind(entitlementInstance))
   .get(domainService.getDomainDashboard.bind(domainService));
 
 loginRoute
