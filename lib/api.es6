@@ -13,7 +13,7 @@ let {NODE_ENV} = process.env,
   nodeEnv = NODE_ENV || "local",
   config = Object.freeze(require("../config/" + nodeEnv)),
   app = express(),
-  // urlPrefix = config.urlPrefix,
+  urlPrefix = config.urlPrefix,
   environmentVariables = require("../config/environmentVariables");
 
 // Checks the required enviro// Defines top middleware and routesnment variables
@@ -30,7 +30,7 @@ app.use(mwAllowCrossDomain);
 app.use(mwAuthenticate);
 // app.use(mwcheckEntitlement);
 app.use(bodyParser.json());
-app.use("/", router);
+app.use(`${urlPrefix}`, router);
 app.use(methodOverride);
 app.use(mwErrorHandler);
 
