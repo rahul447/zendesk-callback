@@ -46,7 +46,7 @@ var environmentVariables = require("./environmentVariables"),
     "preferences": {
       "entitlements": ["financial", "y", "z"]
     },
-    "publicUrls": ["/login", "/getAll"],
+    "publicUrls": ["/login"],
     "smtp": {
       "host": "smtp.apptixemail.net",
       "port": 587,
