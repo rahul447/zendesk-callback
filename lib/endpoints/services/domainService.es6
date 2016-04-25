@@ -79,18 +79,19 @@ export class DomainService {
 
       //    let {portlets} = content.dashboard.financial.groups[0];
 
-      content.dashboard.financial.groups = content.dashboard.financial.groups.map(obj => {
+      if (typeof content.dashboard.financial !== "undefined") {
+        content.dashboard.financial.groups = content.dashboard.financial.groups.map(obj => {
 
-        obj.portlets = obj.portlets.map(port => {
+          obj.portlets = obj.portlets.map(port => {
 
-          if (port.hasOwnProperty("drillDown")) {
-            Reflect.deleteProperty(port, "drillDown");
-          }
-          return port;
+            if (port.hasOwnProperty("drillDown")) {
+              Reflect.deleteProperty(port, "drillDown");
+            }
+            return port;
+          });
+          return obj;
         });
-        return obj;
-      });
-
+      }
       res.send(content);
     })
     .done();
