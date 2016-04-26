@@ -18,7 +18,7 @@ export class EmailService {
         to contact info@cantahealth.com</footer>`,
       "attachments": [{
         "file": "testMail.pdf",
-        "path": "PDF/testMail.pdf"
+        "path": "PDF/Attachment.pdf"
       }]
     };
 
