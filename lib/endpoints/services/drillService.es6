@@ -49,6 +49,8 @@ export class DrillService {
     .then(response => {
       content = this.merge(response[0], response[1]);
       content = content.dashboard[req.params.name].groups[req.params.group].portlets[req.params.portlet];
+      content.icon = response[1].dashboard[req.params.name].groups[req.params.group].icon;
+      content.title = response[1].dashboard[req.params.name].groups[req.params.group].title;
       res.send(content);
     })
     .done();
