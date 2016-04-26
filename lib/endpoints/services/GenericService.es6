@@ -104,11 +104,10 @@ export class GenericService {
         });
         columnNames.shift();
         docDefinition.content[1].table.body.unshift(columnNames);
-        console.log("===============================================");
         console.log(JSON.stringify(docDefinition));
         let pdfDoc = printer.createPdfKitDocument(docDefinition);
 
-        pdfDoc.pipe(fs.createWriteStream("PDF/testMail.pdf"));
+        pdfDoc.pipe(fs.createWriteStream("PDF/Attachment.pdf"));
         pdfDoc.end();
         console.log("Pdf generated successfully");
 
@@ -124,7 +123,13 @@ export class GenericService {
     let valuesArr = [];
 
     Object.keys(obj).map(key => {
-      valuesArr.push(obj[key]);
+      if (!isNaN(obj[key])) {
+        let numberToString = String(obj[key]);
+
+        valuesArr.push(numberToString);
+      }else {
+        valuesArr.push(obj[key]);
+      }
     });
     valuesArr.shift();
     return valuesArr;
