@@ -24,10 +24,11 @@
   "dependencies": {
     "babel-polyfill": "^6.7.4",
     "body-parser": "^1.15.0",
-    "ch-logger": "^1.1.2",
+    "ch-logger": "^1.1.4",
     "ch-nodemailer": "^1.1.0",
     "deepmerge": "^0.2.10",
     "express": "^4.13.4",
+    "express-domain-middleware": "^0.1.0",
     "method-override": "^2.3.5",
     "mongodb": "^2.1.7",
     "pdfkit": "^0.7.2",
