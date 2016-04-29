@@ -36,7 +36,7 @@ export class GenericService {
       docDefinition = {
         "content": [
           {
-            "text": "Tables", "style": "title"
+            "text": "Patient details", "style": "title"
           },
           {
             "style": "tableExample",
