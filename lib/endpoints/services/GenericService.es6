@@ -159,10 +159,10 @@ export class GenericService {
     GenericService.loggerInstance.info("GenericService delete record call");
     repoObj.collection = "actionables";
     repoObj.filter = {
-      "_id": req.params.id
+      "id": req.body.col
     };
     repoObj.limit = 5;
-    repoObj.col = req.body.col;
+    repoObj.id = req.params.id;
     GenericService.genericRepo.removeRecord(repoObj)
       .then(resp => {
         GenericService.loggerInstance.info("GenericService success after remove call");

@@ -128,7 +128,7 @@ export class GenericRepository {
   }
 
   getData(query) {
-    let {collection, limit} = query,
+    let {collection} = query,
 
     /* aggregateObj = [
         {
@@ -164,9 +164,6 @@ export class GenericRepository {
           }
         },
         {
-          "$limit": limit
-        },
-        {
           "$group": {
             "_id": "$id",
             "data": {
@@ -188,12 +185,20 @@ export class GenericRepository {
         return Q.ninvoke(db.collection(collection), "aggregate", aggregateObj);
       })
       .then(findResult => {
+        console.log(findResult);
         return findResult;
       });
   }
 
   removeRecord(params) {
-    let {collection, filter, limit} = params;
+    let {collection, filter, limit, id} = params,
+      removeFrom = {
+        "$pull": {
+          "data": {
+            "id": id
+          }
+        }
+      };
 
     this.loggerInstance.info("Removing record from db having id");
 
@@ -206,7 +211,7 @@ export class GenericRepository {
         this.loggerInstance.debug("Successfully connected");
         console.log(filter);
         return Q.ninvoke(
-          db.collection(collection), "remove", filter)
+          db.collection(collection), "update", filter, removeFrom)
           .then(() => {
             return this.getData({
               "collection": "actionables",
