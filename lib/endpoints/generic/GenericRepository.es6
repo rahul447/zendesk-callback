@@ -185,7 +185,6 @@ export class GenericRepository {
         return Q.ninvoke(db.collection(collection), "aggregate", aggregateObj);
       })
       .then(findResult => {
-        console.log(findResult);
         return findResult;
       });
   }
