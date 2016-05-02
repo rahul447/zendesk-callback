@@ -129,7 +129,8 @@ export class GenericRepository {
 
   getData(query) {
     let {collection, limit} = query,
-      /*aggregateObj = [
+
+    /* aggregateObj = [
         {
           "$group": {
             "_id": {
@@ -151,27 +152,29 @@ export class GenericRepository {
         {
           "$limit": limit
         }
-      ]*/
-        aggregateObj = [
-          {
-            "$unwind": "$data"
-          },
-          {
-            "$sort": {
-              "data.id": -1
+      ] */
+
+      aggregateObj = [
+        {
+          "$unwind": "$data"
+        },
+        {
+          "$sort": {
+            "data.id": -1
+          }
+        },
+        {
+          "$limit": limit
+        },
+        {
+          "$group": {
+            "_id": "$id",
+            "data": {
+              "$push": "$data"
             }
-          },
-          {
-            "$limit": limit
-          },
-          {
-            "$group": {
-              "_id": "$id",
-              "data": {
-                "$push": "$data"
-              }
-            }
-        }];
+          }
+        }
+      ];
 
     this.loggerInstance.info("Retreiving from db");
 
