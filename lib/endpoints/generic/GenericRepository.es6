@@ -123,6 +123,9 @@ export class GenericRepository {
       })
       .then(findResult => {
         this.loggerInstance.debug("Find success", findResult);
+        console.log("========================================");
+        console.log(findResult);
+
         return findResult;
       });
   }
@@ -154,24 +157,14 @@ export class GenericRepository {
         }
       ] */
 
-      aggregateObj = [
-        {
-          "$unwind": "$data"
-        },
-        {
-          "$sort": {
-            "data.id": -1
-          }
-        },
-        {
-          "$group": {
-            "_id": "$id",
-            "data": {
-              "$push": "$data"
-            }
+      aggregateObj = [{
+        "$project": {
+          "id": 1,
+          "data": {
+            "$slice": ["$data", 5]
           }
         }
-      ];
+      }];
 
     this.loggerInstance.info("Retreiving from db");
 
