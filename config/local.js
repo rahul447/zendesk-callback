@@ -58,7 +58,7 @@ var environmentVariables = require("./environmentVariables"),
     "fhirValidator": {
       "baseURI": {
         "protocol": "http",
-        "domain": "10.18.6.113",
+        "domain": "127.0.0.1",
         "port": 8050,
         "version": "baseDstu2"
       }
