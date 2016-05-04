@@ -51,8 +51,8 @@ var environmentVariables = require("./environmentVariables"),
       "host": "smtp.apptixemail.net",
       "port": 587,
       "auth": {
-        "user": "mdoffice@cantahealth.com",
-        "pass": "Password@123"
+        "user": "info@cantahealth.com",
+        "pass": "reset@1234"
       }
     },
     "fhirValidator": {

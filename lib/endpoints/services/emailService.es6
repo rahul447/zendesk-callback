@@ -10,7 +10,7 @@ export class EmailService {
   sendmail(req, res) {
     let mailOption = {
       "to": req.body.to,
-      "from": "mdoffice@cantahealth.com",
+      "from": "info@cantahealth.com",
       "text": "Hello MDOffice",
       "html": `<footer>
       The data displayed in this email is the result of drill down from ${req.body.domain} dashboard.Please do not reply
