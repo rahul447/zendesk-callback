@@ -2,7 +2,7 @@
 function mwErrorHandler(err, req, res, next) {
   if (err) {
     if (err.domain) {
-      console.log("Something Bad Happened", err);
+      console.log("Something Bad Happened", err.stack);
       // you should think about gracefully stopping & respawning your server
       // since an unhandled error might put your application into an unknown state
     }

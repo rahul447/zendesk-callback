@@ -122,10 +122,6 @@ export class GenericRepository {
         );
       })
       .then(findResult => {
-        this.loggerInstance.debug("Find success", findResult);
-        console.log("========================================");
-        console.log(findResult);
-
         return findResult;
       });
   }

@@ -80,7 +80,8 @@ export class DomainService {
       //    let {portlets} = content.dashboard.financial.groups[0];
 
       if (typeof content.dashboard.financial !== "undefined") {
-        content.dashboard.financial.groups = content.dashboard.financial.groups.map(obj => {
+        console.log("===========================");
+        content.dashboard.financial.groups = content.dashboard.financiallll.groups.map(obj => {
 
           obj.portlets = obj.portlets.map(port => {
 
