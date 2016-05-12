@@ -49,7 +49,7 @@ export class LeaderShipService {
       return next(new ApiError("ReferenceError", "Leadership Data not Found in Database", response, 401));
     }, err => {
       console.log("Error Retreiving leadership data");
-      return next(new ApiError("Internal Server Error", "DB error", err, 400));
+      return next(new ApiError("Internal Server Error", "DB error", err, 500));
     })
     .done();
   }

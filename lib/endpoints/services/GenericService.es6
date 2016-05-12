@@ -150,7 +150,7 @@ export class GenericService {
         res.status(200).send(resp);
       }, err => {
         this.loggerInstance.info("GenericService fail after retreive call");
-        return next(new ApiError("Internal Server error", "Error while getting actionables data", err, 400));
+        return next(new ApiError("Internal Server error", "Error while getting actionables data", err, 500));
       })
       .done();
   }
@@ -169,7 +169,7 @@ export class GenericService {
         res.status(200).send(resp);
       }, err => {
         GenericService.loggerInstance.info("GenericService fail after remove call");
-        return next(new ApiError("Internal Server error", "Error while removing actionables data", err, 400));
+        return next(new ApiError("Internal Server error", "Error while removing actionables data", err, 500));
       });
   }
 
@@ -196,7 +196,7 @@ export class GenericService {
     request.get(options, (err, xhp, body) => {
       if (err) {
         GenericService.loggerInstance.debug("Error received:", err);
-        return next(new ApiError("Internal Server error", "Error while validating fhir endpoint", err, 400));
+        return next(new ApiError("Internal Server error", "Error while validating fhir endpoint", err, 500));
       }
       GenericService.loggerInstance.debug("DONE: ", body);
       res.status(200).send(JSON.parse(body));

@@ -31,7 +31,7 @@ export class MwcheckEntitlement {
           new ApiError("ReferenceError", "Entitlement is not present in preferences", "Missing Entitlement", 401));
       }, err => {
         this.loggerInstance.debug("Error while getting entitles", err);
-        return next(new ApiError("Internal Server Error", "Internal DB error", err, 400));
+        return next(new ApiError("Internal Server Error", "DB error", err, 500));
       });
   }
 }

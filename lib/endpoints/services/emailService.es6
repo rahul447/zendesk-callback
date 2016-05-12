@@ -31,11 +31,11 @@ export class EmailService {
             res.status(200).send(resp);
           }, err => {
             console.log("Mail not sent");
-            return next(new ApiError("Internal Server Error", "Mail failure", err, 400));
+            return next(new ApiError("Internal Server Error", "Mail failure", err, 500));
           });
       }, err => {
         console.log("Error generating pdf");
-        return next(new ApiError("Internal Server Error", "Error generating pdf", err, 400));
+        return next(new ApiError("Internal Server Error", "Error generating pdf", err, 500));
       });
   }
 }

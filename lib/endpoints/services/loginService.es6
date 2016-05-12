@@ -58,7 +58,7 @@ export class LoginService {
               return next(new ApiError("User Data not Found in Database", response, "", 401));
             }, err => {
               console.log("Error Retreiving User login data");
-              return next(new ApiError("Internal DB error", err, "", 400));
+              return next(new ApiError("Internal Server Error", "DB error", err, 500));
             });
         }else {
           return next(new ApiError("ReferenceError", "User Data not Found in Database", result, 401));
@@ -66,7 +66,7 @@ export class LoginService {
 
       }, err => {
         console.log("Error from DB");
-        return next(new ApiError("Internal Server Error", "DB error", err, 400));
+        return next(new ApiError("Internal Server Error", "DB error", err, 500));
       });
   }
 }

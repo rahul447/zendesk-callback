@@ -58,7 +58,7 @@ export class DrillService {
       return next(new ApiError("ReferenceError", "Drill Data not Found in Database", response, 401));
     }, err => {
       console.log("Error Retreiving DrillDown data");
-      return next(new ApiError("Internal Server Error", "DB error", err, 400));
+      return next(new ApiError("Internal Server Error", "DB error", err, 500));
     })
     .done();
   }

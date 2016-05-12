@@ -100,7 +100,7 @@ export class DomainService {
       return next(new ApiError("ReferenceError", "Domain Data not Found", response, 401));
     }, err => {
       console.log("Error from DB");
-      return next(new ApiError("Internal Server Error", "DB error", err, 400));
+      return next(new ApiError("Internal Server Error", "DB error", err, 500));
     })
     .done();
   }
