@@ -1,5 +1,5 @@
 "use strict";
-
+import ApiError from "../../util/apiError";
 export class EmailService {
 
   constructor(loggerInstance, genericService, NodeMailer) {
@@ -7,7 +7,7 @@ export class EmailService {
     this.genericService = genericService;
     this.Nodemailer = NodeMailer;
   }
-  sendmail(req, res) {
+  sendmail(req, res, next) {
     let mailOption = {
       "to": req.body.to,
       "from": "info@cantahealth.com",
@@ -30,12 +30,12 @@ export class EmailService {
             console.log("Mail sent Successfully");
             res.status(200).send(resp);
           }, err => {
-            console.log("Mail not sent", err);
-            res.send(500).send(err);
+            console.log("Mail not sent");
+            return next(new ApiError("Internal Server Error", "Mail failure", err, 400));
           });
       }, err => {
         console.log("Error generating pdf");
-        res.status(500).send(err);
+        return next(new ApiError("Internal Server Error", "Error generating pdf", err, 400));
       });
   }
 }

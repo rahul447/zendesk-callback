@@ -123,6 +123,8 @@ export class GenericRepository {
       })
       .then(findResult => {
         return findResult;
+      }, err => {
+        return err;
       });
   }
 
@@ -175,6 +177,8 @@ export class GenericRepository {
       })
       .then(findResult => {
         return findResult;
+      }, err => {
+        return err;
       });
   }
 

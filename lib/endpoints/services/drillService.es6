@@ -1,4 +1,5 @@
 "use strict";
+import ApiError from "../../util/apiError";
 
 let args = {
   "collection": "",
@@ -39,7 +40,7 @@ export class DrillService {
     return this.genericRepo_.retrieve(args);
   }
 
-  getDrillDashboard(req, res) {
+  getDrillDashboard(req, res, next) {
     let content;
 
     this.Q.all([
@@ -47,11 +48,17 @@ export class DrillService {
       this.getDrillPreferences(req)
     ])
     .then(response => {
-      content = this.merge(response[0], response[1]);
-      content = content.dashboard[req.params.name].groups[req.params.group].portlets[req.params.portlet];
-      content.icon = response[1].dashboard[req.params.name].groups[req.params.group].icon;
-      content.title = response[1].dashboard[req.params.name].groups[req.params.group].title;
-      res.send(content);
+      if (response) {
+        content = this.merge(response[0], response[1]);
+        content = content.dashboard[req.params.name].groups[req.params.group].portlets[req.params.portlet];
+        content.icon = response[1].dashboard[req.params.name].groups[req.params.group].icon;
+        content.title = response[1].dashboard[req.params.name].groups[req.params.group].title;
+        return res.status(200).send(content);
+      }
+      return next(new ApiError("ReferenceError", "Drill Data not Found in Database", response, 401));
+    }, err => {
+      console.log("Error Retreiving DrillDown data");
+      return next(new ApiError("Internal Server Error", "DB error", err, 400));
     })
     .done();
   }
