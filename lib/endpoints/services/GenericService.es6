@@ -113,7 +113,7 @@ export class GenericService {
 
         defer.resolve(res);
       }, err => {
-        defer.reject(new ApiError(err, "Database error"));
+        defer.reject(new ApiError("Internal Server Error", "DB error", err, 500));
       });
 
     return defer.promise;
@@ -150,7 +150,7 @@ export class GenericService {
         res.status(200).send(resp);
       }, err => {
         this.loggerInstance.info("GenericService fail after retreive call");
-        return next(new ApiError("Internal Server error", "Error while getting actionables data", err, 500));
+        return next(new ApiError("Internal Server error", "DB error", err, 500));
       })
       .done();
   }
@@ -169,7 +169,7 @@ export class GenericService {
         res.status(200).send(resp);
       }, err => {
         GenericService.loggerInstance.info("GenericService fail after remove call");
-        return next(new ApiError("Internal Server error", "Error while removing actionables data", err, 500));
+        return next(new ApiError("Internal Server error", "DB error", err, 500));
       });
   }
 

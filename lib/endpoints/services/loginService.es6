@@ -55,13 +55,13 @@ export class LoginService {
                 Reflect.deleteProperty(content, "preferenceId");
                 return res.status(200).send(content);
               }
-              return next(new ApiError("User Data not Found in Database", response, "", 401));
+              return next(new ApiError("ReferenceError", "User Data not Found", response, 404));
             }, err => {
               console.log("Error Retreiving User login data");
               return next(new ApiError("Internal Server Error", "DB error", err, 500));
             });
         }else {
-          return next(new ApiError("ReferenceError", "User Data not Found in Database", result, 401));
+          return next(new ApiError("ReferenceError", "User Data not Found", result, 404));
         }
 
       }, err => {

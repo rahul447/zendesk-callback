@@ -28,7 +28,7 @@ export class MwcheckEntitlement {
           return next();
         }
         return next(
-          new ApiError("ReferenceError", "Entitlement is not present in preferences", "Missing Entitlement", 401));
+          new ApiError("ReferenceError", "User is not authorised to access", "Unauthorized", 401));
       }, err => {
         this.loggerInstance.debug("Error while getting entitles", err);
         return next(new ApiError("Internal Server Error", "DB error", err, 500));

@@ -46,7 +46,7 @@ export class LeaderShipService {
         content = this.merge(response[0], response[1]);
         return res.status(200).send(content);
       }
-      return next(new ApiError("ReferenceError", "Leadership Data not Found in Database", response, 401));
+      return next(new ApiError("ReferenceError", "Data not Found", response, 404));
     }, err => {
       console.log("Error Retreiving leadership data");
       return next(new ApiError("Internal Server Error", "DB error", err, 500));
