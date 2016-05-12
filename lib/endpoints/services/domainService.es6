@@ -1,4 +1,5 @@
 "use strict";
+import ApiError from "../../util/apiError";
 
 require("babel-polyfill");
 
@@ -66,7 +67,7 @@ export class DomainService {
     return this.genericRepo_.retrieve(args);
   }
 
-  getDomainDashboard(req, res) {
+  getDomainDashboard(req, res, next) {
     console.log(req.params);
     let content;
 
@@ -75,24 +76,31 @@ export class DomainService {
       this.getDomainPreferences(req)
     ])
     .then(response => {
-      content = this.merge(response[0], response[1]);
+      if (response) {
+        content = this.merge(response[0], response[1]);
 
-      //    let {portlets} = content.dashboard.financial.groups[0];
+        //    let {portlets} = content.dashboard.financial.groups[0];
 
-      if (typeof content.dashboard.financial !== "undefined") {
-        content.dashboard.financial.groups = content.dashboard.financial.groups.map(obj => {
+        if (typeof content.dashboard.financial !== "undefined") {
+          content.dashboard.financial.groups = content.dashboard.financial.groups.map(obj => {
 
-          obj.portlets = obj.portlets.map(port => {
+            obj.portlets = obj.portlets.map(port => {
 
-            if (port.hasOwnProperty("drillDown")) {
-              Reflect.deleteProperty(port, "drillDown");
-            }
-            return port;
+              if (port.hasOwnProperty("drillDown")) {
+                Reflect.deleteProperty(port, "drillDown");
+              }
+              return port;
+            });
+            return obj;
           });
-          return obj;
-        });
+        }
+        return res.status(200).send(content);
       }
-      res.send(content);
+
+      return next(new ApiError("ReferenceError", "Domain Data not Found", response, 404));
+    }, err => {
+      console.log("Error from DB");
+      return next(new ApiError("Internal Server Error", "DB error", err, 500));
     })
     .done();
   }

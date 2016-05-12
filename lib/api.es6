@@ -8,7 +8,7 @@ import mwErrorHandler from "./middleware_services/mwErrorHandler";
 import mwAuthenticate from "./middleware_services/mwAuthenticate";
 import checkEnvironmentVariables from "./util/checkEnvironmentVariables";
 import {router} from "./endpoints/index";
-// import domain from "express-domain-middleware";
+import domain from "express-domain-middleware";
 
 let {NODE_ENV} = process.env,
   nodeEnv = NODE_ENV || "local",
@@ -27,7 +27,7 @@ if (config.environmentVariableChecker.isEnabled) {
 app.set("port", config.http.port);
 
 // Defines top middleware and routes
-// app.use(domain);
+app.use(domain);
 app.use(mwAllowCrossDomain);
 app.use(mwAuthenticate);
 // app.use(mwcheckEntitlement);

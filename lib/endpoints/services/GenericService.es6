@@ -113,7 +113,7 @@ export class GenericService {
 
         defer.resolve(res);
       }, err => {
-        defer.reject(new ApiError(err, "Database error"));
+        defer.reject(new ApiError("Internal Server Error", "DB error", err, 500));
       });
 
     return defer.promise;
@@ -135,7 +135,7 @@ export class GenericService {
     return valuesArr;
   }
 
-  getAll(req, res) {
+  getAll(req, res, next) {
     console.log("GenericService getAll call");
     GenericService.loggerInstance.info("GenericService getAll call");
     repoObj.collection = "actionables";
@@ -150,12 +150,12 @@ export class GenericService {
         res.status(200).send(resp);
       }, err => {
         this.loggerInstance.info("GenericService fail after retreive call");
-        res.status(400).send(err);
+        return next(new ApiError("Internal Server error", "DB error", err, 500));
       })
       .done();
   }
 
-  deleteRecord(req, res) {
+  deleteRecord(req, res, next) {
     GenericService.loggerInstance.info("GenericService delete record call");
     repoObj.collection = "actionables";
     repoObj.filter = {
@@ -169,11 +169,11 @@ export class GenericService {
         res.status(200).send(resp);
       }, err => {
         GenericService.loggerInstance.info("GenericService fail after remove call");
-        res.status(400).send(err);
+        return next(new ApiError("Internal Server error", "DB error", err, 500));
       });
   }
 
-  validateRecord(req, res) {
+  validateRecord(req, res, next) {
     GenericService.loggerInstance.info("Generic schema validation");
     const url = `${
       GenericService.config.fhirValidator.baseURI.protocol
@@ -196,11 +196,10 @@ export class GenericService {
     request.get(options, (err, xhp, body) => {
       if (err) {
         GenericService.loggerInstance.debug("Error received:", err);
-        res.status(400).send(err);
-      } else {
-        GenericService.loggerInstance.debug("DONE: ", body);
-        res.status(200).send(JSON.parse(body));
+        return next(new ApiError("Internal Server error", "Error while validating fhir endpoint", err, 500));
       }
+      GenericService.loggerInstance.debug("DONE: ", body);
+      res.status(200).send(JSON.parse(body));
     });
 
   }

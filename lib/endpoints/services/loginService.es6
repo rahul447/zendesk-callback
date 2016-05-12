@@ -1,4 +1,5 @@
 "use strict";
+import ApiError from "../../util/apiError";
 
 let args = {
   "collection": "",
@@ -14,7 +15,7 @@ export class LoginService {
     this.crypto = crypto;
   }
 
-  login(req, res) {
+  login(req, res, next) {
 
     let encryptedPassword = this.crypto
       .createHash("md5")
@@ -35,25 +36,37 @@ export class LoginService {
 
     this.genericRepo_.retrieve(args)
       .then(result => {
+        if (result) {
+          args.collection = "preferences";
+          args.filter = {
+            "_id": result.preferenceId
+          };
+          args.projection = {
+            "_id": 0,
+            "landingPage": 1,
+            "entitlements": 1
+          };
 
-        args.collection = "preferences";
-        args.filter = {
-          "_id": result.preferenceId
-        };
-        args.projection = {
-          "_id": 0,
-          "landingPage": 1,
-          "entitlements": 1
-        };
+          this.genericRepo_.retrieve(args)
+            .then(response => {
+              if (response) {
+                let content = Object.assign({}, result, response);
 
-        this.genericRepo_.retrieve(args)
-        .then(response => {
+                Reflect.deleteProperty(content, "preferenceId");
+                return res.status(200).send(content);
+              }
+              return next(new ApiError("ReferenceError", "User Data not Found", response, 404));
+            }, err => {
+              console.log("Error Retreiving User login data");
+              return next(new ApiError("Internal Server Error", "DB error", err, 500));
+            });
+        }else {
+          return next(new ApiError("ReferenceError", "User Data not Found", result, 404));
+        }
 
-          let content = Object.assign({}, result, response);
-
-          Reflect.deleteProperty(content, "preferenceId");
-          res.send(content);
-        });
+      }, err => {
+        console.log("Error from DB");
+        return next(new ApiError("Internal Server Error", "DB error", err, 500));
       });
   }
 }

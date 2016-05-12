@@ -24,12 +24,14 @@ export class MwcheckEntitlement {
     };
     this.genericRepo.retrieve(repoObj)
       .then(response => {
-        if (response.entitlements.indexOf(req.params.name) > -1) {
+        if (response && response.entitlements.indexOf(req.params.name) > -1) {
           return next();
         }
-        return next(new ApiError("Missing Entitlement", "Entitlement is not present in preferences", "", 401));
+        return next(
+          new ApiError("ReferenceError", "User is not authorised to access", "Unauthorized", 401));
       }, err => {
         this.loggerInstance.debug("Error while getting entitles", err);
+        return next(new ApiError("Internal Server Error", "DB error", err, 500));
       });
   }
 }

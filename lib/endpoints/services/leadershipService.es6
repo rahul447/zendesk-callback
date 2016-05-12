@@ -1,4 +1,5 @@
 "use strict";
+import ApiError from "../../util/apiError";
 
 let args = {
   "collection": "",
@@ -32,7 +33,7 @@ export class LeaderShipService {
     return this.genericRepo_.retrieve(args);
   }
 
-  getLeadershipDashboard(req, res) {
+  getLeadershipDashboard(req, res, next) {
 
     let content;
 
@@ -41,8 +42,14 @@ export class LeaderShipService {
       this.getLeadershipPreferences(req)
     ])
     .then(response => {
-      content = this.merge(response[0], response[1]);
-      res.send(content);
+      if (response) {
+        content = this.merge(response[0], response[1]);
+        return res.status(200).send(content);
+      }
+      return next(new ApiError("ReferenceError", "Data not Found", response, 404));
+    }, err => {
+      console.log("Error Retreiving leadership data");
+      return next(new ApiError("Internal Server Error", "DB error", err, 500));
     })
     .done();
   }
