@@ -34,6 +34,27 @@ export class MwcheckEntitlement {
         return next(new ApiError("Internal Server Error", "DB error", err, 500));
       });
   }
+
+  getLeaderAction(req, res, next) {
+    repoObj.collection = "preferences";
+    repoObj.filter = {
+      "userId": req.userId
+    };
+    repoObj.projection = {
+      "entitlements": 1
+    };
+    this.genericRepo.retrieve(repoObj)
+      .then(response => {
+        if (response && response.entitlements.indexOf("leadership") > -1) {
+          return next();
+        }
+        return next(
+          new ApiError("ReferenceError", "User is not authorised to access", "Unauthorized", 401));
+      }, err => {
+        this.loggerInstance.debug("Error while getting entitles", err);
+        return next(new ApiError("Internal Server Error", "DB error", err, 500));
+      });
+  }
 }
 
 export function getEntitlementInstance(...args) {

@@ -48,6 +48,7 @@ loginRoute
   .post(loginService.login.bind(loginService));
 
 leadershipRoute
+  .get(entitlementInstance.getLeaderAction.bind(entitlementInstance))
   .get(leadershipService.getLeadershipDashboard.bind(leadershipService));
 
 drillRoute
@@ -60,9 +61,11 @@ pdfRoute
   .get(genericService.generatePDF.bind(genericService));
 
 getAction
+  .get(entitlementInstance.getLeaderAction.bind(entitlementInstance))
   .get(genericService.getAll.bind(genericService));
 
 removeAction
+  .post(entitlementInstance.getLeaderAction.bind(entitlementInstance))
   .post(genericService.deleteRecord.bind(genericService));
 
 fhirValidateRoute
