@@ -15,6 +15,7 @@ import {LoginService} from "./services/loginService";
 import {getGenericServiceInstance} from "./services/GenericService";
 import {getEntitlementInstance} from "../middleware_services/mwcheckEntitlement";
 import NodeMailer from "ch-nodemailer";
+import {RedisCache} from "ch-redis-cache";
 
 let router = express.Router(),
   {NODE_ENV} = process.env,
@@ -30,10 +31,12 @@ let router = express.Router(),
   fhirValidateRoute = router.route("/validate/:endpoint/:id"),
 // leadershipActionableRoute = router.route("/actionable/:id"),
   loginRoute = router.route("/login"),
+  redis = new RedisCache({"redisdb": {"host": config.caching.host,
+    "port": config.caching.port, "ttl": config.caching.ttl, "db": 25}}),
   genericRepo = getGenericRepoInstance({"config": config, "mongodb": mongodb, "loggerInstance": loggerInstance}),
   genericService = getGenericServiceInstance(genericRepo, loggerInstance, mongodb, config),
   domainService = new DomainService(genericRepo, loggerInstance, Q, merge),
-  loginService = new LoginService(genericRepo, loggerInstance, crypto),
+  loginService = new LoginService(genericRepo, loggerInstance, crypto, redis, config),
   leadershipService = new LeaderShipService(genericRepo, loggerInstance, Q, merge),
   drillService = new DrillService(genericRepo, loggerInstance, Q, merge),
   nodeMailerInstance = new NodeMailer(config.smtp),
@@ -45,7 +48,7 @@ domainRoute
   .get(domainService.getDomainDashboard.bind(domainService));
 
 loginRoute
-  .post(loginService.login.bind(loginService));
+  .post(loginService.authLogin.bind(loginService));
 
 leadershipRoute
   .get(entitlementInstance.getLeaderAction.bind(entitlementInstance))

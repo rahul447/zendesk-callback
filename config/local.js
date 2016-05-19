@@ -62,7 +62,9 @@ var environmentVariables = require("./environmentVariables"),
         "port": 8050,
         "version": "baseDstu2"
       }
-    }
+    },
+    "AUTH_SECRET_KEY": environmentVariables.AUTH_SECRET_KEY,
+    "tokenExpireIn": 7200
   };
 
 module.exports = config;
