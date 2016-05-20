@@ -4,7 +4,6 @@ import merge from "deepmerge";
 import express from "express";
 import mongodb from "mongodb";
 import Q from "q";
-import crypto from "crypto";
 import loggerInstance from "../util/FocusApiLogger";
 import {getGenericRepoInstance} from "../endpoints/generic/GenericRepository";
 import {DomainService} from "./services/domainService";
@@ -36,7 +35,7 @@ let router = express.Router(),
   genericRepo = getGenericRepoInstance({"config": config, "mongodb": mongodb, "loggerInstance": loggerInstance}),
   genericService = getGenericServiceInstance(genericRepo, loggerInstance, mongodb, config),
   domainService = new DomainService(genericRepo, loggerInstance, Q, merge),
-  loginService = new LoginService(genericRepo, loggerInstance, crypto, redis, config),
+  loginService = new LoginService(genericRepo, loggerInstance, redis, config),
   leadershipService = new LeaderShipService(genericRepo, loggerInstance, Q, merge),
   drillService = new DrillService(genericRepo, loggerInstance, Q, merge),
   nodeMailerInstance = new NodeMailer(config.smtp),

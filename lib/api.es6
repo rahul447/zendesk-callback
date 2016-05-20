@@ -32,7 +32,7 @@ app.set("tokenSecret", secret);
 
 // Defines top middleware and routes
 app.use(domain);
-app.use(expressJwt({"secret": secret}).unless({"path": ["/focus-api/login"]}));
+app.use(expressJwt({"secret": app.get("tokenSecret")}).unless({"path": ["/focus-api/login"]}));
 app.use(mwInActivityCheck);
 app.use(mwAllowCrossDomain);
 // app.use(mwAuthenticate);

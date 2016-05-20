@@ -1,5 +1,6 @@
 "use strict";
 import ApiError from "../util/apiError";
+import moment from "moment";
 import {RedisCache} from "ch-redis-cache";
 
 function mwInActivityCheck(req, res, next) {
@@ -16,7 +17,7 @@ function mwInActivityCheck(req, res, next) {
     })
     .then(token => {
       if (token) {
-        let currentTime = Math.round(new Date().getTime() / 1000);
+        let currentTime = moment().unix(); // Math.round(new Date().getTime() / 1000);
 
         redisStore.lastCheckIn = currentTime;
         redisStore.token = token;

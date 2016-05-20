@@ -33,6 +33,7 @@
     "express-jwt": "^3.4.0",
     "jsonwebtoken": "^6.2.0",
     "method-override": "^2.3.5",
+    "moment": "^2.13.0",
     "mongodb": "^2.1.7",
     "node-uuid": "^1.4.7",
     "pdfkit": "^0.7.2",
