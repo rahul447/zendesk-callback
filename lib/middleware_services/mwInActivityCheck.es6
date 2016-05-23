@@ -11,6 +11,10 @@ function mwInActivityCheck(req, res, next) {
       "port": config.caching.port, "ttl": config.caching.ttl, "db": 25}}),
     redisStore = {};
 
+  if (req.user) {
+    req.userId = req.user.userId;
+  }
+
   if (config.publicUrls.indexOf(req.url) === -1) {
     redis.getToken({
       "key": req.user.userEmail
