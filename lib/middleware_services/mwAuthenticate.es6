@@ -1,24 +1,34 @@
 "use strict";
 import localConfig from "../../config/local";
 import ApiError from "../util/apiError";
+import expressJwt from "express-jwt";
+
 function mwAuthenticate(req, res, next) {
-  let uniqueIdPattern = new RegExp("^[0-9a-fA-F]{8}" +
-    "-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$");
-
   if (localConfig.publicUrls.indexOf(req.url) === -1 && req.headers.authorization) {
-    let token = req.headers.authorization.split(" ")[1];
+    let token = req.headers.authorization.split(" ")[1],
+      secret = req.app.get("tokenSecret");
 
-    if (!uniqueIdPattern.test(token)) {
+    expressJwt.verify(token, secret, (err, decoded) => {
+      if (!err) {
+        console.log("Token verified", decoded);
+
+        return next();
+      }
+      console.log("Token failed", err);
+      return next(new ApiError("Unauthenticated", "User verification failed", "Bad Request", 400));
+    });
+    return;
+
+    /* if (!uniqueIdPattern.test(token)) {
       return res.status(401).send("Unauthenticated");
     }
     req.userId = token;
-    return next();
+    return next(); */
   }
 
-  if (localConfig.publicUrls.indexOf(req.url) > -1) {
+  /* if (localConfig.publicUrls.indexOf(req.url) > -1) {
     return next();
-  }
-
+  } */
   next(new ApiError("Unauthorized", "User is not authorized to access", "", 401));
 }
 

@@ -8,6 +8,13 @@ function mwErrorHandler(err, req, res, next) {
       // you should think about gracefully stopping & respawning your server
       // since an unhandled error might put your application into an unknown state
     }
+
+    /* eslint-disable */
+    if (err.constructor.name === "UnauthorizedError") {
+      err = new ApiError("Internal Server Error", "Invalid token", "Invalid token", 401);
+    }
+
+    /* eslint-enable */
     if (err instanceof ApiError) {
       res.status(err.statusCode).send(err);
     }else if (err instanceof Error) {

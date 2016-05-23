@@ -5,16 +5,19 @@ import bodyParser from "body-parser";
 import methodOverride from "method-override";
 import mwAllowCrossDomain from "./middleware_services/mwAllowCrossDomain";
 import mwErrorHandler from "./middleware_services/mwErrorHandler";
-import mwAuthenticate from "./middleware_services/mwAuthenticate";
+import mwInActivityCheck from "./middleware_services/mwInActivityCheck";
+// import mwAuthenticate from "./middleware_services/mwAuthenticate";
 import checkEnvironmentVariables from "./util/checkEnvironmentVariables";
 import {router} from "./endpoints/index";
 import domain from "express-domain-middleware";
+import expressJwt from "express-jwt";
 
 let {NODE_ENV} = process.env,
   nodeEnv = NODE_ENV || "local",
   config = Object.freeze(require("../config/" + nodeEnv)),
   app = express(),
   urlPrefix = config.urlPrefix,
+  secret = config.AUTH_SECRET_KEY,
   environmentVariables = require("../config/environmentVariables");
 
 // Checks the required enviro// Defines top middleware and routesnment variables
@@ -25,13 +28,15 @@ if (config.environmentVariableChecker.isEnabled) {
 
 // Sets the relevant config app-wise
 app.set("port", config.http.port);
-
+app.set("tokenSecret", secret);
+app.use(mwAllowCrossDomain);
+app.use(bodyParser.json());
 // Defines top middleware and routes
 app.use(domain);
-app.use(mwAllowCrossDomain);
-app.use(mwAuthenticate);
+app.use(expressJwt({"secret": app.get("tokenSecret")}).unless({"path": ["/focus-api/login"]}));
+app.use(mwInActivityCheck);
+// app.use(mwAuthenticate);
 // app.use(mwcheckEntitlement);
-app.use(bodyParser.json());
 app.use(`${urlPrefix}`, router);
 app.use(methodOverride);
 app.use(mwErrorHandler);
