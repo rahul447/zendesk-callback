@@ -21,8 +21,8 @@ function mwInActivityCheck(req, res, next) {
 
         redisStore.lastCheckIn = currentTime;
         redisStore.token = token;
-        if ((currentTime - Number(token.lastCheckIn)) > 30) {
-          return next(new ApiError("Internal Server Error", "Invalid token", "Session timeout", 401));
+        if ((currentTime - Number(token.lastCheckIn)) > config.MaxInactivityTime) {
+          return next(new ApiError("Unauthorized", "Invalid token", "Session timeout", 401));
         }
         redis.setToken({
           "key": req.user.userEmail,
