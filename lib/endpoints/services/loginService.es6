@@ -115,6 +115,8 @@ export class LoginService {
                     "expiresIn": this.config.tokenExpireIn
                   };
 
+                Reflect.deleteProperty(content, "preferenceId");
+                Reflect.deleteProperty(content, "userId");
                 payload.userId = user.userId;
                 payload.userEmail = user.emailID;
                 payload.preferenceId = user.preferenceId;
