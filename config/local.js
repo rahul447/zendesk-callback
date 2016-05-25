@@ -65,7 +65,7 @@ var environmentVariables = require("./environmentVariables"),
     },
     "AUTH_SECRET_KEY": environmentVariables.AUTH_SECRET_KEY,
     "tokenExpireIn": 7200,
-    "MaxInactivityTime": 30
+    "MaxInactivityTime": 1800
   };
 
 module.exports = config;

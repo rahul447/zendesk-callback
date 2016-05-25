@@ -122,6 +122,7 @@ export class LoginService {
                 payload.preferenceId = user.preferenceId;
                 payload.landingPage = response.landingPage;
                 payload.entitlements = response.entitlements;
+                payload.role = "Provider";
                 this.createToken(payload, secret, claims)
                   .then(token => {
                     content.token = token;
