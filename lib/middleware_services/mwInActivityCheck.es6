@@ -28,12 +28,13 @@ function mwInActivityCheck(req, res, next) {
         if ((currentTime - Number(user.lastCheckIn)) > config.MaxInactivityTime) {
           redis.deleteKey(req.user.userEmail)
             .then(success => {
-              loggerInstance.debug("======User logged out successfully===>", success);
+              console.log("======User logged out successfully===>", success);
               return next(new ApiError("Unauthorized", "Invalid token", "Session timeout", 401));
             }, err => {
               loggerInstance.debug("===Error while logging out=>", err);
               return next(new ApiError("Internal Server Error", "Redis Server Error", err, 500));
             });
+          return;
         }
         redis.setToken({
           "key": req.user.userEmail,
