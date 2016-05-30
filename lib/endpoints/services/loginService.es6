@@ -130,6 +130,9 @@ export class LoginService {
                     inactivityCheck.lastCheckIn = moment().unix(); // Math.round(new Date().getTime() / 1000);
                     redisStore.key = user.emailID;
                     redisStore.value = inactivityCheck;
+                    redisStore.options = {
+                      "ttl": this.config.tokenExpireIn
+                    };
                     this.setTokenInRedis(redisStore)
                       .then(done => {
                         console.log("Value added to redis", done);

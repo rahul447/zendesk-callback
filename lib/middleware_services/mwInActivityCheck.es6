@@ -38,7 +38,10 @@ function mwInActivityCheck(req, res, next) {
         }
         redis.setToken({
           "key": req.user.userEmail,
-          "value": redisStore
+          "value": redisStore,
+          "options": {
+            "ttl": config.tokenExpireIn
+          }
         })
           .then(() => {
             console.log("Time updated in token");
