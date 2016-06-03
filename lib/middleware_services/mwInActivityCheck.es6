@@ -22,6 +22,13 @@ function mwInActivityCheck(req, res, next) {
     })
     .then(user => {
       if (user) {
+        if (req.headers.authorization) {
+          let repeatToken = req.headers.authorization.split(" ")[1];
+
+          if (repeatToken !== user.token) {
+            return next(new ApiError("Internal Server Error", "Invalid token", "Invalid token", 401));
+          }
+        }
         loggerInstance.debug("=======Inactivity user found, now check time========>");
         let currentTime = moment().unix(); // Math.round(new Date().getTime() / 1000);
 

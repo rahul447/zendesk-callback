@@ -255,7 +255,22 @@ export class LoginService {
       .then(loggedIn => {
         if (loggedIn) {
           console.log("User already logged in with other device ", loggedIn);
-          return next(new ApiError("ReferenceError", "User is not authorised to access", "Unauthorized", 401));
+          this.userLogoutOnLogin(req)
+            .then(succ => {
+              this.loggerInstance.info("First device", succ);
+              this.validateUser(args, secret)
+                .then(user => {
+                  if (user instanceof ApiError) {
+                    return next(user);
+                  }
+                  return res.status(200).send(user);
+                });
+            }, failed => {
+              this.loggerInstance.info("Redis Server Error");
+              return next(new ApiError("Internal Server Error", "Redis Server Error", failed, 500));
+            });
+          console.log("==============DONE============");
+          return;
         }
         this.loggerInstance.info("First device");
         this.validateUser(args, secret)
@@ -269,5 +284,21 @@ export class LoginService {
         this.loggerInstance.info("Redis Server Error");
         return next(new ApiError("Internal Server Error", "Redis Server Error", error, 500));
       });
+  }
+
+  userLogoutOnLogin(req) {
+    console.log("=========userlogoutonlogin===================");
+    let deferred = Q.defer();
+
+    this.loggerInstance.debug("=====User Logout======>", req.body.emailID);
+    this.redis.deleteKey(req.body.emailID)
+      .then(success => {
+        this.loggerInstance.debug("======User logged out successfully===>", success);
+        deferred.resolve(success);
+      }, err => {
+        this.loggerInstance.debug("===Error while logging out=>", err);
+        deferred.reject(err);
+      });
+    return deferred.promise;
   }
 }
