@@ -1,7 +1,9 @@
 "use strict";
 import ApiError from "../util/apiError";
+import loggerInstance from "../util/FocusApiLogger";
 
 function mwErrorHandler(err, req, res, next) {
+  loggerInstance.info("=======mwErrorhandler=========>");
   if (err) {
     if (err.domain) {
       console.log("Something Bad Happened", err.stack);
@@ -11,6 +13,7 @@ function mwErrorHandler(err, req, res, next) {
 
     /* eslint-disable */
     if (err.constructor.name === "UnauthorizedError") {
+      loggerInstance.info("=======Invalid token============>");
       err = new ApiError("Internal Server Error", "Invalid token", "Invalid token", 401);
     }
 

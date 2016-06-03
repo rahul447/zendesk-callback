@@ -46,6 +46,7 @@ export class DomainService {
    */
 
   getDomainData(req) {
+    this.loggerInstance.info("======Get Domain Data======>");
     let projection = `dashboard.${req.params.name}`;
 
     args.collection = "users";
@@ -56,6 +57,7 @@ export class DomainService {
   }
 
   getDomainPreferences(req) {
+    this.loggerInstance.info("=======Get Domain Preferences======>");
     let projection = `dashboard.${req.params.name}`;
 
     args.collection = "preferences";
@@ -68,7 +70,7 @@ export class DomainService {
   }
 
   getDomainDashboard(req, res, next) {
-    console.log(req.params);
+    this.loggerInstance.info("===get Domain DashBoard====>");
     let content;
 
     this.Q.all([
