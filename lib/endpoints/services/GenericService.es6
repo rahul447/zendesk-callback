@@ -29,6 +29,7 @@ export class GenericService {
   }
 
   generatePDF(req, res) {
+    GenericService.loggerInstance.info("=======Generating PDF==========>");
     let printer = new PDFDocument(fonts),
       defer = Q.defer(),
       projection = `dashboard.${req.body.domain}.groups.portlets.drillDown.data`,

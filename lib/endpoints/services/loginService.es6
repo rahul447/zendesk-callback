@@ -62,7 +62,7 @@ export class LoginService {
               }
               return next(new ApiError("ReferenceError", "User Data not Found", response, 404));
             }, err => {
-              console.log("Error Retreiving User login data");
+              this.loggerInstance.info("Error Retreiving User login data");
               return next(new ApiError("Internal Server Error", "DB error", err, 500));
             });
         }else {
@@ -70,12 +70,13 @@ export class LoginService {
         }
 
       }, err => {
-        console.log("Error from DB");
+        this.loggerInstance.info("Error from DB");
         return next(new ApiError("Internal Server Error", "DB error", err, 500));
       });
   }
 
   validateUser(credentials, secret) {
+    this.loggerInstance.info("========Validate User=======>");
     let defer = Q.defer();
 
     this.genericRepo_.retrieve(credentials)
@@ -142,22 +143,22 @@ export class LoginService {
                         defer.reject(new ApiError("Internal Server Error", "Redis server error", fail, 500));
                       });
                   }, noToken => {
-                    console.log("Jwt token error");
+                    this.loggerInstance.info("Jwt token error");
                     defer.reject(new ApiError("Internal Server Error", "token error", noToken, 500));
                   });
               }else {
-                console.log("User preferences not found");
+                this.loggerInstance.info("User preferences not found");
                 defer.resolve(new ApiError("ReferenceError", "User not found", response, 404));
               }
             }, fail => {
               defer.reject(new ApiError("Internal Server Error", "DB error", fail, 500));
             });
         }else {
-          console.log("User not found");
+          this.loggerInstance.info("User not found");
           defer.resolve(new ApiError("ReferenceError", "User not found", user, 404));
         }
       }, error => {
-        console.log("Generic repo error");
+        this.loggerInstance.info("Generic repo error");
         defer.reject(new ApiError("Internal Server Error", "DB error", error, 500));
       });
 
@@ -165,6 +166,7 @@ export class LoginService {
   }
 
   getPreferences(projections) {
+    this.loggerInstance.info("=====get user prefernces=========>");
     let defer = Q.defer();
 
     this.genericRepo_.retrieve(projections)
@@ -179,6 +181,7 @@ export class LoginService {
   }
 
   createToken(payload, secret, claims) {
+    this.loggerInstance.info("=======create user token==========>");
     let defer = Q.defer();
 
     jwt.sign(payload, secret, claims, (error, token) => {
@@ -194,6 +197,7 @@ export class LoginService {
   }
 
   setTokenInRedis(redisStore) {
+    this.loggerInstance.info("=======set token in redis=========>");
     let deferred = Q.defer();
 
     this.redis.setToken(redisStore)
@@ -206,6 +210,7 @@ export class LoginService {
   }
 
   singleSignAuth(user) {
+    this.loggerInstance.info("=====Single Sign Auth=============>");
     let deferred = Q.defer();
 
     this.redis.getToken({
@@ -213,10 +218,10 @@ export class LoginService {
     })
       .then(result => {
         if (result) {
-          console.log("success in getting token ");
+          this.loggerInstance.info("success in getting token ");
           deferred.resolve(result);
         }else {
-          console.log("Token not found");
+          this.loggerInstance.info("Token not found");
           deferred.resolve(result);
         }
       }, err => {
@@ -227,6 +232,7 @@ export class LoginService {
   }
 
   authLogin(req, res, next) {
+    this.loggerInstance.info("=======Authlogin============>");
     let encryptedPassword = crypto
       .createHash("md5")
       .update(req.body.password)
@@ -251,7 +257,7 @@ export class LoginService {
           console.log("User already logged in with other device ", loggedIn);
           return next(new ApiError("ReferenceError", "User is not authorised to access", "Unauthorized", 401));
         }
-        console.log("First device");
+        this.loggerInstance.info("First device");
         this.validateUser(args, secret)
           .then(user => {
             if (user instanceof ApiError) {
@@ -260,7 +266,7 @@ export class LoginService {
             return res.status(200).send(user);
           });
       }, error => {
-        console.log("Redis Server Error");
+        this.loggerInstance.info("Redis Server Error");
         return next(new ApiError("Internal Server Error", "Redis Server Error", error, 500));
       });
   }

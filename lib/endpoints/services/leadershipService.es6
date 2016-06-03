@@ -17,6 +17,7 @@ export class LeaderShipService {
   }
 
   getLeadershipData(req) {
+    this.loggerInstance.info("=====get leadership Data======>");
     args.collection = "users";
     args.filter = {"_id": req.userId};
     args.projection = {"dashboard.leadership": 1};
@@ -25,6 +26,7 @@ export class LeaderShipService {
   }
 
   getLeadershipPreferences(req) {
+    this.loggerInstance.info("=====get leadership preferences======>");
     args.collection = "preferences";
     args.filter = {"userId": req.userId};
     // _id in preferences collection indicates preference id. We don't need that.
@@ -34,6 +36,7 @@ export class LeaderShipService {
   }
 
   getLeadershipDashboard(req, res, next) {
+    this.loggerInstance.info("====get leadership dashboard===========>");
 
     let content;
 

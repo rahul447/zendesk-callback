@@ -27,12 +27,12 @@ if (config.environmentVariableChecker.isEnabled) {
 }
 
 // Sets the relevant config app-wise
+app.use(domain);
 app.set("port", config.http.port);
 app.set("tokenSecret", secret);
 app.use(mwAllowCrossDomain);
 app.use(bodyParser.json());
 // Defines top middleware and routes
-app.use(domain);
 app.use(expressJwt({"secret": app.get("tokenSecret")}).unless({"path": ["/focus-api/login"]}));
 app.use(mwInActivityCheck);
 // app.use(mwAuthenticate);

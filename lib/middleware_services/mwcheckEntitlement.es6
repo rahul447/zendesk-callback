@@ -10,6 +10,7 @@ export class MwcheckEntitlement {
   }
 
   getEntitlements(req, res, next) {
+
     if (req.user && req.user.entitlements.indexOf(req.params.name) > -1) {
       return next();
     }
