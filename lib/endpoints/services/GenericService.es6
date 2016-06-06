@@ -34,6 +34,7 @@ export class GenericService {
       projection = `dashboard.${req.body.domain}.groups.portlets.drillDown.data`,
       content, columnNames, tableRowContent,
       docDefinition = {
+        "pageOrientation": "landscape",
         "content": [
           {
             "text": "Patient details", "style": "title"
