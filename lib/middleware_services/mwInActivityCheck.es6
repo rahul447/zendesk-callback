@@ -16,11 +16,20 @@ function mwInActivityCheck(req, res, next) {
   }
 
   if (config.publicUrls.indexOf(req.url) === -1) {
+    loggerInstance.info("========User Inactivity Check===========>");
     redis.getToken({
       "key": req.user.userEmail
     })
     .then(user => {
       if (user) {
+        if (req.headers.authorization) {
+          let repeatToken = req.headers.authorization.split(" ")[1];
+
+          if (repeatToken !== user.token) {
+            return next(new ApiError("Internal Server Error", "Invalid token", "Invalid token", 401));
+          }
+        }
+        loggerInstance.debug("=======Inactivity user found, now check time========>");
         let currentTime = moment().unix(); // Math.round(new Date().getTime() / 1000);
 
         redisStore.lastCheckIn = currentTime;
@@ -28,6 +37,7 @@ function mwInActivityCheck(req, res, next) {
         if ((currentTime - Number(user.lastCheckIn)) > config.MaxInactivityTime) {
           redis.deleteKey(req.user.userEmail)
             .then(success => {
+              loggerInstance.debug("======User logged out successfully===>", success);
               console.log("======User logged out successfully===>", success);
               return next(new ApiError("Unauthorized", "Invalid token", "Session timeout", 401));
             }, err => {
@@ -44,20 +54,21 @@ function mwInActivityCheck(req, res, next) {
           }
         })
           .then(() => {
-            console.log("Time updated in token");
+            loggerInstance.debug("==========Time updated in token==========");
             return next();
           }, tokenNotSet => {
-            console.log("Time not updated in token", tokenNotSet);
+            loggerInstance.debug("Time not updated in token", tokenNotSet);
             return next(new ApiError("Internal Server Error", "Redis Server Error", tokenNotSet, 500));
           });
       }else {
         return next(new ApiError("Unauthorized", "User not logged in", "", 401));
       }
     }, err => {
-      console.log("Redis server error ", err);
+      loggerInstance.debug("Redis server error ", err);
       return next(new ApiError("Internal Server Error", "Redis Server Error", "", 500));
     });
   }else {
+    loggerInstance.info("=========Public Api/Endpoint Access==========>");
     return next();
   }
 }

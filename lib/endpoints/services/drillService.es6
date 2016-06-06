@@ -17,7 +17,7 @@ export class DrillService {
   }
 
   getDrillData(req) {
-
+    this.loggerInstance.info("=========get Drill Data===========>");
     let projection = `dashboard.${req.params.name}.groups`;
 
     args.collection = "users";
@@ -28,7 +28,7 @@ export class DrillService {
   }
 
   getDrillPreferences(req) {
-
+    this.loggerInstance.info("=========get Drill Preferences========>");
     let projection = `dashboard.${req.params.name}.groups`;
 
     args.collection = "preferences";
@@ -41,6 +41,7 @@ export class DrillService {
   }
 
   getDrillDashboard(req, res, next) {
+    this.loggerInstance.info("=========get Drill Dashboard========>");
     let content;
 
     this.Q.all([
@@ -49,6 +50,7 @@ export class DrillService {
     ])
     .then(response => {
       if (response) {
+        this.loggerInstance.debug("======Dashboard response success=======>");
         content = this.merge(response[0], response[1]);
         content = content.dashboard[req.params.name].groups[req.params.group].portlets[req.params.portlet];
         content.icon = response[1].dashboard[req.params.name].groups[req.params.group].icon;
