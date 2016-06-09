@@ -20,7 +20,7 @@ export class DrillService {
     this.loggerInstance.info("=========get Drill Data===========>");
     let projection = `dashboard.${req.params.name}.groups`;
 
-    args.collection = "users";
+    args.collection = "drilldown_data";
     args.filter = {"_id": req.userId};
     args.projection[projection] = 1;
 
