@@ -17,10 +17,21 @@ export class DrillService {
   }
 
   getDrillData(req) {
-    this.loggerInstance.info("=========get Drill Data===========>");
+    this.loggerInstance.info("=========get Drill Data===========>", req.userId);
     let projection = `dashboard.${req.params.name}.groups`;
 
     args.collection = "drilldown_data";
+    args.filter = {"_id": req.userId};
+    args.projection[projection] = 1;
+
+    return this.genericRepo_.retrieve(args);
+  }
+
+  getDrillDataUsers(req) {
+    this.loggerInstance.info("=========get Drill Data=====USERS======>");
+    let projection = `dashboard.${req.params.name}.groups`;
+
+    args.collection = "users";
     args.filter = {"_id": req.userId};
     args.projection[projection] = 1;
 
@@ -46,13 +57,16 @@ export class DrillService {
 
     this.Q.all([
       this.getDrillData(req),
-      this.getDrillPreferences(req)
+      this.getDrillPreferences(req),
+      this.getDrillDataUsers(req)
     ])
     .then(response => {
       if (response) {
         this.loggerInstance.debug("======Dashboard response success=======>");
-        content = this.merge(response[0], response[1]);
+        content = this.merge(response[0], response[1], response[2]);
         content = content.dashboard[req.params.name].groups[req.params.group].portlets[req.params.portlet];
+        content.component =
+          response[2].dashboard[req.params.name].groups[req.params.group].portlets[req.params.portlet].component;
         content.icon = response[1].dashboard[req.params.name].groups[req.params.group].icon;
         content.title = response[1].dashboard[req.params.name].groups[req.params.group].title;
         return res.status(200).send(content);
