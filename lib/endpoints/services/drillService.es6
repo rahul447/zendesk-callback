@@ -53,20 +53,21 @@ export class DrillService {
 
   getDrillDashboard(req, res, next) {
     this.loggerInstance.info("=========get Drill Dashboard========>");
-    let content;
+    let content = {};
 
     this.Q.all([
-      this.getDrillData(req),
+      this.getDrillDataUsers(req),
       this.getDrillPreferences(req),
-      this.getDrillDataUsers(req)
+      this.getDrillData(req)
     ])
     .then(response => {
       if (response) {
-        this.loggerInstance.debug("======Dashboard response success=======>");
-        content = this.merge(response[0], response[1], response[2]);
-        content = content.dashboard[req.params.name].groups[req.params.group].portlets[req.params.portlet];
-        content.component =
-          response[2].dashboard[req.params.name].groups[req.params.group].portlets[req.params.portlet].component;
+        let drillUsers = response[0].dashboard[req.params.name].groups[req.params.group].portlets[req.params.portlet],
+          drillPref = response[1].dashboard[req.params.name].groups[req.params.group].portlets[req.params.portlet];
+
+        content.component = this.merge(drillUsers, drillPref);
+        content.drillDown = response[2]
+          .dashboard[req.params.name].groups[req.params.group].portlets[req.params.portlet].drillDown;
         content.icon = response[1].dashboard[req.params.name].groups[req.params.group].icon;
         content.title = response[1].dashboard[req.params.name].groups[req.params.group].title;
         return res.status(200).send(content);
