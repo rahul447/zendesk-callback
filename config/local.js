@@ -46,7 +46,7 @@ var environmentVariables = require("./environmentVariables"),
     "preferences": {
       "entitlements": ["financial", "y", "z"]
     },
-    "publicUrls": ["/focus-api/login"],
+    "publicUrls": ["/focus-api/login", "/focus-api/logout"],
     "smtp": {
       "host": "smtp.apptixemail.net",
       "port": 587,
