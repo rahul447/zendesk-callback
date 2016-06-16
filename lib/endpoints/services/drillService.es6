@@ -53,7 +53,6 @@ export class DrillService {
 
   getDrillDashboard(req, res, next) {
     this.loggerInstance.info("=========get Drill Dashboard========>");
-    let content = {};
 
     this.Q.all([
       this.getDrillDataUsers(req),
@@ -63,14 +62,14 @@ export class DrillService {
     .then(response => {
       if (response) {
         let drillUsers = response[0].dashboard[req.params.name].groups[req.params.group].portlets[req.params.portlet],
-          drillPref = response[1].dashboard[req.params.name].groups[req.params.group].portlets[req.params.portlet];
+          drillPref = response[1].dashboard[req.params.name].groups[req.params.group].portlets[req.params.portlet],
+          output = this.merge(drillUsers, drillPref);
 
-        content.component = this.merge(drillUsers, drillPref);
-        content.drillDown = response[2]
+        output.drillDown = response[2]
           .dashboard[req.params.name].groups[req.params.group].portlets[req.params.portlet].drillDown;
-        content.icon = response[1].dashboard[req.params.name].groups[req.params.group].icon;
-        content.title = response[1].dashboard[req.params.name].groups[req.params.group].title;
-        return res.status(200).send(content);
+        output.icon = response[1].dashboard[req.params.name].groups[req.params.group].icon;
+        output.title = response[1].dashboard[req.params.name].groups[req.params.group].title;
+        return res.status(200).send(output);
       }
       return next(new ApiError("ReferenceError", "Data not Found", response, 404));
     }, err => {
