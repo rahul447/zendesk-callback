@@ -13,7 +13,7 @@ var environmentVariables = require("./environmentVariables"),
       name: "focus-api",
       level: environmentVariables.FOCUS_LOGGING_LEVEL,
       "console": true,
-      "path": "/var/log/focus-api.log"
+      "path": "/var/log/focus/focus-api.log"
     },
     "mongoDb": {
       "connectionString": environmentVariables.FOCUS_MONGO_CONNECTION_STRING,
@@ -46,7 +46,7 @@ var environmentVariables = require("./environmentVariables"),
     "preferences": {
       "entitlements": ["financial", "y", "z"]
     },
-    "publicUrls": ["/focus-api/login"],
+    "publicUrls": ["/focus-api/login", "/focus-api/logout"],
     "smtp": {
       "host": "smtp.apptixemail.net",
       "port": 587,

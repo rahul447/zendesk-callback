@@ -17,7 +17,18 @@ export class DrillService {
   }
 
   getDrillData(req) {
-    this.loggerInstance.info("=========get Drill Data===========>");
+    this.loggerInstance.info("=========get Drill Data===========>", req.userId);
+    let projection = `dashboard.${req.params.name}.groups`;
+
+    args.collection = "drilldown_data";
+    args.filter = {"_id": req.userId};
+    args.projection[projection] = 1;
+
+    return this.genericRepo_.retrieve(args);
+  }
+
+  getDrillDataUsers(req) {
+    this.loggerInstance.info("=========get Drill Data=====USERS======>");
     let projection = `dashboard.${req.params.name}.groups`;
 
     args.collection = "users";
@@ -42,20 +53,23 @@ export class DrillService {
 
   getDrillDashboard(req, res, next) {
     this.loggerInstance.info("=========get Drill Dashboard========>");
-    let content;
 
     this.Q.all([
-      this.getDrillData(req),
-      this.getDrillPreferences(req)
+      this.getDrillDataUsers(req),
+      this.getDrillPreferences(req),
+      this.getDrillData(req)
     ])
     .then(response => {
       if (response) {
-        this.loggerInstance.debug("======Dashboard response success=======>");
-        content = this.merge(response[0], response[1]);
-        content = content.dashboard[req.params.name].groups[req.params.group].portlets[req.params.portlet];
-        content.icon = response[1].dashboard[req.params.name].groups[req.params.group].icon;
-        content.title = response[1].dashboard[req.params.name].groups[req.params.group].title;
-        return res.status(200).send(content);
+        let drillUsers = response[0].dashboard[req.params.name].groups[req.params.group].portlets[req.params.portlet],
+          drillPref = response[1].dashboard[req.params.name].groups[req.params.group].portlets[req.params.portlet],
+          output = this.merge(drillUsers, drillPref);
+
+        output.drillDown = response[2]
+          .dashboard[req.params.name].groups[req.params.group].portlets[req.params.portlet].drillDown;
+        output.icon = response[1].dashboard[req.params.name].groups[req.params.group].icon;
+        output.title = response[1].dashboard[req.params.name].groups[req.params.group].title;
+        return res.status(200).send(output);
       }
       return next(new ApiError("ReferenceError", "Data not Found", response, 404));
     }, err => {

@@ -16,10 +16,10 @@ export class LeaderShipService {
     this.Q = Q;
   }
 
-  getLeadershipData(req) {
+  getLeadershipData() {
     this.loggerInstance.info("=====get leadership Data======>");
-    args.collection = "users";
-    args.filter = {"_id": req.userId};
+    args.collection = "leadership";
+    args.filter = {};
     args.projection = {"dashboard.leadership": 1};
 
     return this.genericRepo_.retrieve(args);
@@ -46,6 +46,8 @@ export class LeaderShipService {
     ])
     .then(response => {
       if (response) {
+        console.log("==================leader===========>");
+        console.log(response);
         content = this.merge(response[0], response[1]);
         return res.status(200).send(content);
       }

@@ -52,7 +52,7 @@ loginRoute
   .post(loginService.authLogin.bind(loginService));
 
 logoutRoute
-  .get(logoutService.userLogout.bind(logoutService));
+  .post(logoutService.userLogout.bind(logoutService));
 
 leadershipRoute
   .get(entitlementInstance.getLeaderAction.bind(entitlementInstance))
