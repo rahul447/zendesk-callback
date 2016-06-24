@@ -3,7 +3,7 @@ import ApiError from "../util/apiError";
 import loggerInstance from "../util/FocusApiLogger";
 
 function mwErrorHandler(err, req, res, next) {
-  loggerInstance.info("=======mwErrorhandler=========>");
+  loggerInstance.info("=======mwErrorhandler=========>", err);
   if (err) {
     if (err.domain) {
       console.log("Something Bad Happened", err.stack);

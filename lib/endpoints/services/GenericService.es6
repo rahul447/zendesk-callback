@@ -200,8 +200,40 @@ export class GenericService {
         GenericService.loggerInstance.debug("Error received:", err);
         return next(new ApiError("Internal Server error", "Error while validating fhir endpoint", err, 500));
       }
-      GenericService.loggerInstance.debug("DONE: ", body);
-      res.status(200).send(JSON.parse(body));
+
+      let response = JSON.parse(body),
+        result = {};
+
+      if (req.params.endpoint === "Patient") {
+        console.log("in Patient", response);
+        result.PatientID = response._id;
+        result.PatientName = response.name[0].text;
+        result.DOB = response.birthDate;
+        result.PatientCity = response.address[0].city;
+        if (response.careProvider.length > 0) {
+          for (let i = 0; i < response.careProvider.length; i++) {
+            let str = response.careProvider[i].reference;
+
+            if (str.startsWith("Practitioner")) {
+              let ress = str.split("/");
+
+              result.RefID = ress[1];
+            }
+          }
+        }
+      } else if (req.params.endpoint === "Appointment") {
+        result.VisitID = response.identifier[0].value;
+        let actorRef = response.participant[1].actor.reference,
+          resactorRef = actorRef.split("/");
+
+        result.PatientID = resactorRef[1];
+        result.DayofWeek = response.start;
+
+        // result.AppointmentType = response.name;
+      }
+      GenericService.loggerInstance
+        .debug("DONE: ", body);
+      res.status(200).send(result);
     });
 
   }
