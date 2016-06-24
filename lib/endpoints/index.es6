@@ -16,6 +16,7 @@ import {getGenericServiceInstance} from "./services/GenericService";
 import {getEntitlementInstance} from "../middleware_services/mwcheckEntitlement";
 import NodeMailer from "ch-nodemailer";
 import {RedisCache} from "ch-redis-cache";
+import {UserAuditLogService} from "./services/userAuditLogService";
 
 let router = express.Router(),
   {NODE_ENV} = process.env,
@@ -32,6 +33,7 @@ let router = express.Router(),
 // leadershipActionableRoute = router.route("/actionable/:id"),
   loginRoute = router.route("/login"),
   logoutRoute = router.route("/logout"),
+  userAuditLogRoute = router.route("/userAuditLog"),
   redis = new RedisCache({"redisdb": config.caching, "logger": loggerInstance}),
   genericRepo = getGenericRepoInstance({"config": config, "mongodb": mongodb, "loggerInstance": loggerInstance}),
   genericService = getGenericServiceInstance(genericRepo, loggerInstance, mongodb, config),
@@ -42,7 +44,8 @@ let router = express.Router(),
   drillService = new DrillService(genericRepo, loggerInstance, Q, merge),
   nodeMailerInstance = new NodeMailer(config.smtp),
   entitlementInstance = getEntitlementInstance(genericRepo, loggerInstance),
-  emailService = new EmailService(loggerInstance, genericService, nodeMailerInstance);
+  emailService = new EmailService(loggerInstance, genericService, nodeMailerInstance),
+  userAuditLogService = new UserAuditLogService(genericRepo, loggerInstance, Q, merge);
 
 domainRoute
   .get(entitlementInstance.getEntitlements.bind(entitlementInstance))
@@ -77,5 +80,8 @@ removeAction
 
 fhirValidateRoute
   .get(genericService.validateRecord.bind(genericService));
+
+userAuditLogRoute
+  .post(userAuditLogService.add.bind(userAuditLogService));
 
 export {router};
