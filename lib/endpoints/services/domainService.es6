@@ -52,6 +52,7 @@ export class DomainService {
     args.collection = "users";
     args.filter = {"_id": req.userId};
     args.projection[projection] = 1;
+    args.projection.lastUpdatedDate = 1;
     console.log(args);
     return this.genericRepo_.retrieve(args);
   }

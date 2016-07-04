@@ -94,6 +94,7 @@ export class GenericService {
     repoObj.collection = "users";
     repoObj.filter = {"_id": req.userId};
     repoObj.projection[projection] = 1;
+    repoObj.projection.lastUpdatedDate = 1;
     console.log(repoObj);
 
     GenericService.genericRepo.retrieve(repoObj)
