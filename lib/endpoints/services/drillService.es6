@@ -34,6 +34,7 @@ export class DrillService {
     args.collection = "users";
     args.filter = {"_id": req.userId};
     args.projection[projection] = 1;
+    args.projection.lastUpdatedDate = 1;
 
     return this.genericRepo_.retrieve(args);
   }
@@ -69,6 +70,7 @@ export class DrillService {
           .dashboard[req.params.name].groups[req.params.group].portlets[req.params.portlet].drillDown;
         output.icon = response[1].dashboard[req.params.name].groups[req.params.group].icon;
         output.title = response[1].dashboard[req.params.name].groups[req.params.group].title;
+        output.lastUpdatedDate = response[0].lastUpdatedDate;
         return res.status(200).send(output);
       }
       return next(new ApiError("ReferenceError", "Data not Found", response, 404));

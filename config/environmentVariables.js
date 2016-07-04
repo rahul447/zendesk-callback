@@ -3,7 +3,7 @@
 // eslint disable no-var
 
 var environmentVariables = {
-  "FOCUS_MONGO_CONNECTION_STRING": "mongodb://10.18.6.109:27017/fhir",
+  "FOCUS_MONGO_CONNECTION_STRING": "mongodb://10.18.6.109:27017/fhir_QA",
   "FOCUS_REDIS_HOST": "localhost",
   "FOCUS_REDIS_PORT": "6379",
   "FOCUS_LOGGING_LEVEL": "debug",
