@@ -54,7 +54,7 @@ export class EmailService {
       }]
     };
 
-    return this.genericService.generatePDFforFilteredData(req, res, next)
+    return this.genericService.generatePDFforFilteredData(req)
       .then(() => {
         mailOption.subject = `Focus email for ${req.body.domain} drilldown for user ${req.body.emailId}`;
         return this.Nodemailer.send(mailOption)
