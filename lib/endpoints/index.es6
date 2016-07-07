@@ -25,6 +25,7 @@ let router = express.Router(),
   drillRoute = router.route("/domain/:name/:group/:portlet"),
   leadershipRoute = router.route("/leadership"),
   emailRoute = router.route("/sendmail"),
+  filterEmailRoute = router.route("/sendfilteredEmail"),
   pdfRoute = router.route("/download"),
   getAction = router.route("/getAll"),
   removeAction = router.route("/remove/:id"),
@@ -63,6 +64,9 @@ drillRoute
 
 emailRoute
   .post(emailService.sendmail.bind(emailService));
+
+filterEmailRoute
+  .post(emailService.sendFilteredDataMail.bind(emailService));
 
 pdfRoute
   .get(genericService.generatePDF.bind(genericService));
