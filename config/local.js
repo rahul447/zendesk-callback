@@ -11,9 +11,16 @@ var environmentVariables = require("./environmentVariables"),
     },
     "logger": {
       name: "focus-api",
-      level: environmentVariables.FOCUS_LOGGING_LEVEL,
-      "console": true,
-      "path": "/var/log/focus/focus-api.log"
+      "streams": [
+        {
+          "level": environmentVariables.FOCUS_LOGGING_LEVEL,
+          "stream": process.stdout
+        },
+        {
+          "level": environmentVariables.FOCUS_LOGGING_LEVEL,
+          "path": "/var/log/focus/focus-api.log"
+        }
+      ]
     },
     "mongoDb": {
       "connectionString": environmentVariables.FOCUS_MONGO_CONNECTION_STRING,

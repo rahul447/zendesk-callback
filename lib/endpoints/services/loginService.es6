@@ -247,7 +247,8 @@ export class LoginService {
       "_id": 0,
       "preferenceId": 1,
       "emailID": 1,
-      "userId": 1
+      "userId": 1,
+      "userName": 1
     };
     const secret = req.app.get("tokenSecret");
 

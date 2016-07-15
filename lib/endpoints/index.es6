@@ -26,11 +26,11 @@ let router = express.Router(),
   drillRoute = router.route("/domain/:name/:group/:portlet"),
   leadershipRoute = router.route("/leadership"),
   emailRoute = router.route("/sendmail"),
+  filterEmailRoute = router.route("/sendfilteredEmail"),
   pdfRoute = router.route("/download"),
   getAction = router.route("/getAll"),
   removeAction = router.route("/remove/:id"),
   fhirValidateRoute = router.route("/validate/:endpoint/:id"),
-// leadershipActionableRoute = router.route("/actionable/:id"),
   loginRoute = router.route("/login"),
   logoutRoute = router.route("/logout"),
   userAuditLogRoute = router.route("/userAuditLog"),
@@ -45,7 +45,7 @@ let router = express.Router(),
   nodeMailerInstance = new NodeMailer(config.smtp),
   entitlementInstance = getEntitlementInstance(genericRepo, loggerInstance),
   emailService = new EmailService(loggerInstance, genericService, nodeMailerInstance),
-  userAuditLogService = new UserAuditLogService(genericRepo, loggerInstance, Q, merge);
+  userAuditLogService = new UserAuditLogService(genericRepo, loggerInstance);
 
 domainRoute
   .get(entitlementInstance.getEntitlements.bind(entitlementInstance))
@@ -66,6 +66,9 @@ drillRoute
 
 emailRoute
   .post(emailService.sendmail.bind(emailService));
+
+filterEmailRoute
+  .post(emailService.sendFilteredDataMail.bind(emailService));
 
 pdfRoute
   .get(genericService.generatePDF.bind(genericService));

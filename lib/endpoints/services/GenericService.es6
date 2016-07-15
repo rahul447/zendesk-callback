@@ -4,6 +4,7 @@ import ApiError from "../../util/apiError";
 import fs from "fs";
 import Q from "q";
 import request from "request";
+
 let protectedGenericInstance,
   fonts = {
     "Roboto": {
@@ -91,9 +92,10 @@ export class GenericService {
         }
       };
 
-    repoObj.collection = "users";
+    repoObj.collection = "drilldown_data";
     repoObj.filter = {"_id": req.userId};
     repoObj.projection[projection] = 1;
+    repoObj.projection.lastUpdatedDate = 1;
     console.log(repoObj);
 
     GenericService.genericRepo.retrieve(repoObj)
@@ -118,6 +120,82 @@ export class GenericService {
         defer.reject(new ApiError("Internal Server Error", "DB error", err, 500));
       });
 
+    return defer.promise;
+  }
+
+  generatePDFforFilteredData(req) {
+    let printer = new PDFDocument(fonts),
+      defer = Q.defer(),
+      content, columnNames, tableRowContent,
+      docDefinition = {
+        "pageOrientation": "landscape",
+        "content": [
+          {
+            "text": "Patient details", "style": "title"
+          },
+          {
+            "style": "tableExample",
+            "table": {
+              "body": [
+              ]
+            },
+            "layout": {
+              hLineWidth(i, node) {
+                return (i === 0 || i === node.table.body.length) ? 2 : 1;
+              },
+              vLineWidth(i, node) {
+                return (i === 0 || i === node.table.widths.length) ? 2 : 1;
+              },
+              hLineColor(i, node) {
+                return (i === 0 || i === node.table.body.length) ? "black" : "gray";
+              },
+              vLineColor(i, node) {
+                return (i === 0 || i === node.table.widths.length) ? "black" : "gray";
+              }
+            }
+          }
+        ],
+        "styles": {
+          "header": {
+            "fontSize": 18,
+            "bold": true,
+            "margin": [0, 0, 0, 10]
+          },
+          "subheader": {
+            "fontSize": 16,
+            "bold": true,
+            "margin": [0, 10, 0, 5]
+          },
+          "tableExample": {
+            "margin": [0, 5, 0, 15]
+          },
+          "tableHeader": {
+            "bold": true,
+            "fontSize": 13,
+            "color": "black"
+          }
+        },
+        "defaultStyle": {
+          // alignment: 'justify'
+        }
+      },
+      pdfDoc,
+      resp = req.body.data;
+
+    content = resp;
+    Object.keys(content).map(key => {
+      columnNames = Object.keys(content[key]);
+      tableRowContent = this.generateValueOfObj(content[key]);
+      docDefinition.content[1].table.body.push(tableRowContent);
+    });
+    columnNames.shift();
+    docDefinition.content[1].table.body.unshift(columnNames);
+    console.log(JSON.stringify(docDefinition));
+    pdfDoc = printer.createPdfKitDocument(docDefinition);
+    pdfDoc.pipe(fs.createWriteStream("PDF/Attachment.pdf"));
+    console.log("Pdf generated successfully");
+    pdfDoc.end();
+    defer.resolve();
     return defer.promise;
   }
 

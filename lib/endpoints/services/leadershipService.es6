@@ -21,6 +21,7 @@ export class LeaderShipService {
     args.collection = "leadership";
     args.filter = {};
     args.projection = {"dashboard.leadership": 1};
+    args.projection.lastUpdatedDate = 1;
 
     return this.genericRepo_.retrieve(args);
   }

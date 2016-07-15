@@ -1,8 +1,6 @@
 "use strict";
 // import ApiError from "../../util/apiError";
 
-require("babel-polyfill");
-
 let insertArgs = {
   "collection": "",
   "docs": []
@@ -10,11 +8,9 @@ let insertArgs = {
 
 export class UserAuditLogService {
 
-  constructor(genericRepo, loggerInstance, Q, merge) {
-    this.merge = merge;
+  constructor(genericRepo, loggerInstance) {
     this.genericRepo_ = genericRepo;
     this.loggerInstance = loggerInstance;
-    this.Q = Q;
   }
 
   add(req, res) {
@@ -24,7 +20,7 @@ export class UserAuditLogService {
     this.loggerInstance.info("===post User Audit Log====>");
 
     insertArgs.collection = "auditlogs";
-    insertArgs.docs = [data];
+    insertArgs.docs = Array.of(data);
 
     // return this.genericRepo_.insertMany(insertArgs);
     this.genericRepo_.insertMany(insertArgs);
