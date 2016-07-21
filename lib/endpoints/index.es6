@@ -62,6 +62,7 @@ leadershipRoute
   .get(leadershipService.getLeadershipDashboard.bind(leadershipService));
 
 drillRoute
+  .get(entitlementInstance.getEntitlements.bind(entitlementInstance))
   .get(drillService.getDrillDashboard.bind(drillService));
 
 emailRoute
