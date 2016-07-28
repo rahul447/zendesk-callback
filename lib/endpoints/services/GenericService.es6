@@ -261,7 +261,7 @@ export class GenericService {
       GenericService.config.fhirValidator.baseURI.domain
       }:${
       GenericService.config.fhirValidator.baseURI.port
-      }/fhir/v1/${
+      }/fhir/v1/focus/${
       req.params.endpoint
       }/${
       req.params.id
@@ -283,31 +283,16 @@ export class GenericService {
         result = {};
 
       if (req.params.endpoint === "Patient") {
-        console.log("in Patient", response);
-        result.PatientID = response._id;
+        result.PatientID = response.identifier[0].value;
         result.PatientName = response.name[0].text;
-        result.DOB = response.birthDate;
+        result.DOB = new Date(response.birthDate);
         result.PatientCity = response.address[0].city;
-        if (response.careProvider.length > 0) {
-          for (let i = 0; i < response.careProvider.length; i++) {
-            let str = response.careProvider[i].reference;
-
-            if (str.startsWith("Practitioner")) {
-              let ress = str.split("/");
-
-              result.RefID = ress[1];
-            }
-          }
-        }
       } else if (req.params.endpoint === "Appointment") {
         result.VisitID = response.identifier[0].value;
-        let actorRef = response.participant[1].actor.reference,
-          resactorRef = actorRef.split("/");
-
-        result.PatientID = resactorRef[1];
-        result.DayofWeek = response.start;
-
-        // result.AppointmentType = response.name;
+        result.Description = response.description;
+        result.Status = response.status;
+        result.Comments = response.comment;
+        result.DayofWeek = new Date(response.start);
       }
       GenericService.loggerInstance
         .debug("DONE: ", body);
