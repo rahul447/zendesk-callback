@@ -128,6 +128,34 @@ export class GenericRepository {
       });
   }
 
+  retrieveMany(param) {
+
+    this.loggerInstance.info("Retreiving many from db");
+
+    let {collection, filter, projection} = param;
+
+    return this.db_
+      .catch(err => {
+        this.loggerInstance.debug("Connection to db is broken at create: ", err);
+        return this.connectToDb_();
+      })
+      .then(db => {
+        this.loggerInstance.debug("Successfully connected");
+        this.loggerInstance.debug(collection);
+        this.loggerInstance.debug(filter);
+        this.loggerInstance.debug(projection);
+        return Q.ninvoke(
+          db.collection(collection),
+          "find", filter, projection
+        );
+      })
+      .then(findResult => {
+        return findResult.toArray();
+      }, err => {
+        return err;
+      });
+  }
+
   insertMany(param) {
 
     this.loggerInstance.info("Inserting into db");

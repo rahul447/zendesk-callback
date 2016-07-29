@@ -34,6 +34,7 @@ let router = express.Router(),
   loginRoute = router.route("/login"),
   logoutRoute = router.route("/logout"),
   userAuditLogRoute = router.route("/userAuditLog"),
+  userAuditLogDownloadRoute = router.route("/userAuditLogDownload"),
   redis = new RedisCache({"redisdb": config.caching, "logger": loggerInstance}),
   genericRepo = getGenericRepoInstance({"config": config, "mongodb": mongodb, "loggerInstance": loggerInstance}),
   genericService = getGenericServiceInstance(genericRepo, loggerInstance, mongodb, config),
@@ -87,5 +88,8 @@ fhirValidateRoute
 
 userAuditLogRoute
   .post(userAuditLogService.add.bind(userAuditLogService));
+
+userAuditLogDownloadRoute
+  .post(userAuditLogService.getAuditLogs.bind(userAuditLogService));
 
 export {router};
