@@ -1,5 +1,6 @@
 "use strict";
 import ApiError from "../../util/apiError";
+import json2csv from "json2csv";
 
 let insertArgs = {
     "collection": "",
@@ -54,26 +55,55 @@ export class UserAuditLogService {
     return this.get(args)
       .then(data => {
 
-        let json2csv = require("json2csv"),
-          fields = ["auditType", "auditAction", "auditActionParam", "user.emailID", "user.userName",
-            "user.landingPage", "user.entitlements", "dashboardName", "fromState", "toState",
-            "fromParams", "toParams", "preferredFilters", "dateRange", "gridColumns",
-            "gridColumnFilters", "patientID", "recordDate", "timestamp", "auditLogVersion"],
-          fieldNames = ["Audit Type", "Audit Action", "Action Parameters", "Email ID", "User Name",
-            "Landing Page", "Entitlements", "Dashboard Name", "From State", "To State",
-            "From Params", "To Params", "Preferred Filters", "Date Range", "Grid Columns",
-            "Grid Columns Filters", "Patient ID", "Record Date", "Timestamp", "Log Version"],
-          csv = json2csv({"data": data, "fields": fields, "fieldNames": fieldNames}, (error, convertedCSV) => {
-            if (error) {
-              this.loggerInstance_.error(error);
-              res.status(412).send(error.stack);
-            } else {
-              res.status(200).send(convertedCSV);
-            }
-          });
+        let fields = ["auditType",
+            "auditAction",
+            "auditActionParam",
+            "user.emailID",
+            "user.userName",
+            "user.landingPage",
+            "user.entitlements",
+            "dashboardName",
+            "fromState",
+            "toState",
+            "fromParams",
+            "toParams",
+            "preferredFilters",
+            "dateRange",
+            "gridColumns",
+            "gridColumnFilters",
+            "patientID",
+            "recordDate",
+            "timestamp",
+            "auditLogVersion"],
+          fieldNames = ["Audit Type",
+              "Audit Action",
+              "Action Parameters",
+              "Email ID",
+              "User Name",
+              "Landing Page",
+              "Entitlements",
+              "Dashboard Name",
+              "From State",
+              "To State",
+              "From Params",
+              "To Params",
+              "Preferred Filters",
+              "Date Range",
+              "Grid Columns",
+              "Grid Columns Filters",
+              "Patient ID",
+              "Record Date",
+              "Timestamp",
+              "Log Version"];
 
-        this.loggerInstance_.error("csv length: ", csv.length);
-
+        json2csv({"data": data, "fields": fields, "fieldNames": fieldNames}, (error, convertedCSV) => {
+          if (error) {
+            this.loggerInstance_.error(error);
+            res.status(500).send(error.stack);
+          } else {
+            res.status(200).send(convertedCSV);
+          }
+        });
       }, err => {
         return next(new ApiError("Internal Server Error", "DB error", err, 500));
       });
