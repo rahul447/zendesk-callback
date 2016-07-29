@@ -1,5 +1,7 @@
 "use strict";
 import ApiError from "../../util/apiError";
+import Q from "q";
+import merge from "deepmerge";
 
 let args = {
   "collection": "",
@@ -9,11 +11,9 @@ let args = {
 
 export class LeaderShipService {
 
-  constructor(genericRepo, loggerInstance, Q, merge) {
-    this.merge = merge;
+  constructor(genericRepo, loggerInstance) {
     this.genericRepo_ = genericRepo;
     this.loggerInstance = loggerInstance;
-    this.Q = Q;
   }
 
   getLeadershipData() {
@@ -41,7 +41,7 @@ export class LeaderShipService {
 
     let content;
 
-    this.Q.all([
+    Q.all([
       this.getLeadershipData(req),
       this.getLeadershipPreferences(req)
     ])
@@ -49,7 +49,7 @@ export class LeaderShipService {
       if (response) {
         console.log("==================leader===========>");
         console.log(response);
-        content = this.merge(response[0], response[1]);
+        content = merge(response[0], response[1]);
         return res.status(200).send(content);
       }
       return next(new ApiError("ReferenceError", "Data not Found", response, 404));

@@ -1,5 +1,7 @@
 "use strict";
 import ApiError from "../../util/apiError";
+import Q from "q";
+import merge from "deepmerge";
 
 require("babel-polyfill");
 
@@ -11,11 +13,9 @@ let args = {
 
 export class DomainService {
 
-  constructor(genericRepo, loggerInstance, Q, merge) {
-    this.merge = merge;
+  constructor(genericRepo, loggerInstance) {
     this.genericRepo_ = genericRepo;
     this.loggerInstance = loggerInstance;
-    this.Q = Q;
   }
 
   /*
@@ -74,13 +74,13 @@ export class DomainService {
     this.loggerInstance.info("===get Domain DashBoard====>");
     let content;
 
-    this.Q.all([
+    Q.all([
       this.getDomainData(req),
       this.getDomainPreferences(req)
     ])
     .then(response => {
       if (response) {
-        content = this.merge(response[0], response[1]);
+        content = merge(response[0], response[1]);
 
         //    let {portlets} = content.dashboard.financial.groups[0];
 
