@@ -100,7 +100,7 @@ export class GenericService {
 
     GenericService.genericRepo.retrieve(repoObj)
       .then(resp => {
-        content = resp.dashboard[req.body.domain].groups[0].portlets[0].drillDown.data;
+        content = resp.dashboard[req.body.domain].groups[req.body.groupId].portlets[req.body.portletId].drillDown.data;
         Object.keys(content).map(key => {
           columnNames = Object.keys(content[key]);
           tableRowContent = this.generateValueOfObj(content[key]);
@@ -179,10 +179,9 @@ export class GenericService {
           // alignment: 'justify'
         }
       },
-      pdfDoc,
-      resp = req.body.data;
+      pdfDoc;
 
-    content = resp;
+    content = req.body.data;
     Object.keys(content).map(key => {
       columnNames = Object.keys(content[key]);
       tableRowContent = this.generateValueOfObj(content[key]);
