@@ -33,7 +33,6 @@ export class GenericService {
     GenericService.loggerInstance.info("=======Generating PDF==========>");
     let printer = new PDFDocument(fonts),
       defer = Q.defer(),
-      projection = `dashboard.${req.body.domain}.groups.portlets.drillDown.data`,
       content, columnNames, tableRowContent,
       docDefinition = {
         "pageOrientation": "landscape",
@@ -94,14 +93,16 @@ export class GenericService {
 
     repoObj.collection = "drilldown_data";
     repoObj.filter = {"_id": req.userId};
-    repoObj.projection[projection] = 1;
-    repoObj.projection.lastUpdatedDate = 1;
+    repoObj._domain = req.body.domain;
+    repoObj._group = req.body.groupId;
+    repoObj._portlet = req.body.portletId;
     console.log(repoObj);
 
-    GenericService.genericRepo.retrieve(repoObj)
+    GenericService.genericRepo.drillData(repoObj)
       .then(resp => {
-        console.log("====BODY Data====> ", req.body);
-        content = resp.dashboard[req.body.domain].groups[req.body.groupId].portlets[req.body.portletId].drillDown.data;
+        console.log("====Response Data====> ", resp);
+        content = resp[0].value.drillDown.data;
+        // console.log(content);
         Object.keys(content).map(key => {
           columnNames = Object.keys(content[key]);
           tableRowContent = this.generateValueOfObj(content[key]);
@@ -110,8 +111,12 @@ export class GenericService {
         columnNames.shift();
         docDefinition.content[1].table.body.unshift(columnNames);
         // console.log(JSON.stringify(docDefinition));
+        // fs.writeFile('data.json', JSON.stringify(docDefinition, null, 2) , 'utf-8');
+        
+        
         let pdfDoc = printer.createPdfKitDocument(docDefinition);
 
+        console.log("NOw writing to PDF=================>");
         pdfDoc.pipe(fs.createWriteStream("PDF/Attachment.pdf"));
         pdfDoc.end();
         console.log("Pdf generated successfully");

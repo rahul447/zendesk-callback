@@ -99,11 +99,11 @@ export class GenericRepository {
         .lookupForEventContainer(event)
     );
   }
-
+  
   paginate(param) {
     this.loggerInstance.info("Retreiving from db");
     console.log(param);
-
+    
     const {collection, filter, _start, _end, _group, _portlet, _domain} = param,
       aggregateObj = [
         {
@@ -134,7 +134,7 @@ export class GenericRepository {
           }
         }
       ];
-
+    
     return this.db_
       .catch(err => {
         this.loggerInstance.debug("Connection to db is broken at create: ", err);
@@ -149,7 +149,7 @@ export class GenericRepository {
       }, err => {
         return err;
       });
-
+    
   }
 
   retrieve(param) {
