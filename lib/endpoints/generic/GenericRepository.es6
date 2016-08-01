@@ -99,11 +99,12 @@ export class GenericRepository {
         .lookupForEventContainer(event)
     );
   }
-  
+
   paginate(param) {
     this.loggerInstance.info("Retreiving from db");
-    
-    const {collection, filter, _start, _end,  _group, _portlet} = param,
+    console.log(param);
+
+    const {collection, filter, _start, _end, _group, _portlet, _domain} = param,
       aggregateObj = [
         {
           "$match": filter
@@ -111,7 +112,7 @@ export class GenericRepository {
         {
           "$project": {
             "data": {
-              "$arrayElemAt": ["$dashboard.operational.groups", _group]
+              "$arrayElemAt": [`$dashboard.${_domain}.groups`, _group]
             }
           }
         },
@@ -125,7 +126,7 @@ export class GenericRepository {
         {
           "$project": {
             "item": {
-              "$slice": ["$value.drillDown.data", _start,  _end]
+              "$slice": ["$value.drillDown.data", _start, _end]
             },
             "arrLength": {
               "$size": "$value.drillDown.data"
@@ -133,7 +134,7 @@ export class GenericRepository {
           }
         }
       ];
-  
+
     return this.db_
       .catch(err => {
         this.loggerInstance.debug("Connection to db is broken at create: ", err);
@@ -148,7 +149,7 @@ export class GenericRepository {
       }, err => {
         return err;
       });
-    
+
   }
 
   retrieve(param) {

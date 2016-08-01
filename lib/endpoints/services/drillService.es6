@@ -14,12 +14,10 @@ export class DrillService {
   constructor(genericRepo, loggerInstance, config) {
     this.genericRepo_ = genericRepo;
     this.loggerInstance = loggerInstance;
-    this.config = config
+    this.config = config;
   }
-  
-  
 
-  /*getDrillData(req) {
+  /* getDrillData(req) {
     this.loggerInstance.info("=========get Drill Data===========>", req.userId);
     let projection = `dashboard.${req.params.name}.groups`;
 
@@ -28,24 +26,25 @@ export class DrillService {
     args.projection[projection] = 1;
 
     return this.genericRepo_.retrieve(args);
-  }*/
-  
+  } */
+
   getDrillData(req) {
     this.loggerInstance.info("=========get Drill Data===========>", req.userId);
-    const pageNum  = typeof req.params.pageNumber !== "undefined" ? req.params.pageNumber : 0;
-    
+    const pageNum = typeof req.params.pageNumber !== "undefined" ? req.params.pageNumber : 0;
+
     args.collection = "drilldown_data";
     args.filter = {"_id": req.userId};
-    
+
     if (req.params.pageNumber > 1) {
       args._start = this.config.limit * (pageNum - 1);
     }else {
-      args._start = this.config.limit * pageNum
+      args._start = this.config.limit * pageNum;
     }
     args._end = args._start + this.config.limit;
-    args._group = req.params.group;
-    args._portlet = req.params.portlet;
-  
+    args._domain = req.params.name;
+    args._group = Number(req.params.group);
+    args._portlet = Number(req.params.portlet);
+
     return this.genericRepo_.paginate(args);
   }
 
@@ -87,11 +86,12 @@ export class DrillService {
         let drillUsers = response[0].dashboard[req.params.name].groups[req.params.group].portlets[req.params.portlet],
           drillPref = response[1].dashboard[req.params.name].groups[req.params.group].portlets[req.params.portlet],
           output = merge(drillUsers, drillPref),
-          totalPages = response[2].arrLength % this.config.limit;
+          totalPages = response[2][0].arrLength / this.config.limit,
+          mod = response[2][0].arrLength % this.config.limit;
 
-        output.numberOfResults = response[2].arrLength;
-        output.pages = totalPages === 0 ? totalPages : Math.round(totalPages);
-        output.drillDown = response[2].item;
+        output.numberOfResults = response[2][0].arrLength;
+        output.pages = mod === 0 ? totalPages : Math.round(totalPages);
+        output.drillDown = response[2][0].item;
         output.icon = response[1].dashboard[req.params.name].groups[req.params.group].icon;
         output.title = response[1].dashboard[req.params.name].groups[req.params.group].title;
         output.lastUpdatedDate = response[0].lastUpdatedDate;
