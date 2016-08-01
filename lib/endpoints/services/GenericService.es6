@@ -100,6 +100,7 @@ export class GenericService {
 
     GenericService.genericRepo.retrieve(repoObj)
       .then(resp => {
+        console.log("====BODY Data====> ", req.body);
         content = resp.dashboard[req.body.domain].groups[req.body.groupId].portlets[req.body.portletId].drillDown.data;
         Object.keys(content).map(key => {
           columnNames = Object.keys(content[key]);
@@ -108,7 +109,7 @@ export class GenericService {
         });
         columnNames.shift();
         docDefinition.content[1].table.body.unshift(columnNames);
-        console.log(JSON.stringify(docDefinition));
+        // console.log(JSON.stringify(docDefinition));
         let pdfDoc = printer.createPdfKitDocument(docDefinition);
 
         pdfDoc.pipe(fs.createWriteStream("PDF/Attachment.pdf"));
