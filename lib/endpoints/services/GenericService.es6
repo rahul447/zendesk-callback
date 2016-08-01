@@ -115,7 +115,6 @@ export class GenericService {
         docDefinition.content[1].table.body.unshift(columnNames);
         // console.log(JSON.stringify(docDefinition));
         // fs.writeFile('data.json', JSON.stringify(docDefinition, null, 2) , 'utf-8');
-  
         console.log("NOw writing to PDF=================>");
         let createStream = fs.createWriteStream("PDF/Attachment.pdf"),
           pdfDoc = printer.createPdfKitDocument(docDefinition);
