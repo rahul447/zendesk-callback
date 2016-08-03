@@ -129,17 +129,16 @@ export class UserAuditLogService {
         if (data.isAuditTrail) {
           this.loggerInstance_.debug("====== User Authenticate for Audit Trail successfully===>", data);
           req.isAuditTrail = true;
+          return next();
         }
       }, err => {
         this.loggerInstance_.debug("===Error while Authenticate for Audit Trail=>", err);
         next(new ApiError("Internal Server Error", "Mongo server Error for Audit Trail", err, 500));
       })
       .catch(error => {
-      this.loggerInstance_.debug("===Error while Authenticate for Audit Trail=>", error);
-      next(new ApiError("Internal Server Error", "Mongo server Error for Audit Trail", error, 500));
-    })
-      .done(() => {
-        next();
-      });
+        this.loggerInstance_.debug("===Error while Authenticate for Audit Trail=>", error);
+        next(new ApiError("Internal Server Error", "Mongo server Error for Audit Trail", error, 500));
+      })
+      .done();
   }
 }
