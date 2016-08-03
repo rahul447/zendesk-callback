@@ -30,17 +30,17 @@ export class DrillService {
 
   getDrillData(req) {
     this.loggerInstance.info("=========get Drill Data===========>", req.userId);
-    const pageNum = typeof req.params.pageNumber !== "undefined" ? req.params.pageNumber : 0;
+    const pageNum = typeof req.params.pageNumber !== "undefined" ? Number(req.params.pageNumber) : 1;
 
     args.collection = "drilldown_data";
     args.filter = {"_id": req.userId};
 
-    if (req.params.pageNumber > 1) {
-      args._start = this.config.limit * (pageNum - 1);
+    if (pageNum === 1) {
+      args._start = 0;
     }else {
       args._start = this.config.limit * pageNum;
     }
-    args._end = args._start + this.config.limit;
+    args._end = this.config.limit;
     args._domain = req.params.name;
     args._group = Number(req.params.group);
     args._portlet = Number(req.params.portlet);
@@ -90,8 +90,11 @@ export class DrillService {
           mod = response[2][0].arrLength % this.config.limit;
 
         output.numberOfResults = response[2][0].arrLength;
+        output.limit = this.config.limit;
         output.pages = mod === 0 ? totalPages : Math.round(totalPages);
-        output.drillDown = response[2][0].item;
+        output.drillDown = {
+          "data": response[2][0].item
+        };
         output.icon = response[1].dashboard[req.params.name].groups[req.params.group].icon;
         output.title = response[1].dashboard[req.params.name].groups[req.params.group].title;
         output.lastUpdatedDate = response[0].lastUpdatedDate;
