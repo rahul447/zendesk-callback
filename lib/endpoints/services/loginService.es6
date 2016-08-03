@@ -248,7 +248,8 @@ export class LoginService {
       "preferenceId": 1,
       "emailID": 1,
       "userId": 1,
-      "userName": 1
+      "userName": 1,
+      "isAuditTrail": 1
     };
     const secret = req.app.get("tokenSecret");
 

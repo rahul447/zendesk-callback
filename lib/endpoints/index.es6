@@ -90,6 +90,7 @@ userAuditLogRoute
   .post(userAuditLogService.add.bind(userAuditLogService));
 
 userAuditLogDownloadRoute
+  .post(userAuditLogService.authenticateAuditLogs.bind(userAuditLogService))
   .post(userAuditLogService.getAuditLogs.bind(userAuditLogService));
 
 export {router};
