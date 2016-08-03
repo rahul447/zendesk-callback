@@ -37,7 +37,6 @@ export class DrillService {
     if (pageNum === 1) {
       args._start = 0;
     }else if (pageNum) {
-      console.log("=======Inside PageNum=>>>>>>>>>>>>", pageNum);
       args._start = this.config.limit * (pageNum - 1);
     }
     args._end = this.config.limit;
@@ -117,6 +116,10 @@ export class DrillService {
       console.log("Error Retreiving DrillDown data");
       return next(new ApiError("Internal Server Error", "DB error", err, 500));
     })
+      .catch(error => {
+        this.loggerInstance.debug(`Caught Error ${DrillService.name}.getDrillDashboard `, error);
+        return res.status(500).send(error);
+      })
     .done();
   }
 }
