@@ -3,12 +3,6 @@ import ApiError from "../../util/apiError";
 import Q from "q";
 import merge from "deepmerge";
 
-let args = {
-  "collection": "",
-  "filter": {},
-  "projection": {}
-};
-
 export class DrillService {
 
   constructor(genericRepo, loggerInstance, config) {
@@ -29,6 +23,11 @@ export class DrillService {
   } */
 
   getDrillData(req) {
+    let args = {
+      "collection": "",
+      "filter": {}
+    };
+
     this.loggerInstance.info("=========get Drill Data===========>", req.userId);
     const pageNum = typeof req.params.pageNumber !== "undefined" ? Number(req.params.pageNumber) : 1;
 
@@ -37,8 +36,9 @@ export class DrillService {
 
     if (pageNum === 1) {
       args._start = 0;
-    }else {
-      args._start = this.config.limit * pageNum;
+    }else if (pageNum) {
+      console.log("=======Inside PageNum=>>>>>>>>>>>>", pageNum);
+      args._start = this.config.limit * (pageNum - 1);
     }
     args._end = this.config.limit;
     args._domain = req.params.name;
@@ -49,8 +49,14 @@ export class DrillService {
   }
 
   getDrillDataUsers(req) {
+    let args = {
+        "collection": "",
+        "filter": {},
+        "projection": {}
+      },
+      projection = `dashboard.${req.params.name}.groups`;
+
     this.loggerInstance.info("=========get Drill Data=====USERS======>");
-    let projection = `dashboard.${req.params.name}.groups`;
 
     args.collection = "users";
     args.filter = {"_id": req.userId};
@@ -61,8 +67,14 @@ export class DrillService {
   }
 
   getDrillPreferences(req) {
+    let args = {
+        "collection": "",
+        "filter": {},
+        "projection": {}
+      },
+      projection = `dashboard.${req.params.name}.groups`;
+
     this.loggerInstance.info("=========get Drill Preferences========>");
-    let projection = `dashboard.${req.params.name}.groups`;
 
     args.collection = "preferences";
     args.filter = {"userId": req.userId};
@@ -91,7 +103,7 @@ export class DrillService {
 
         output.numberOfResults = response[2][0].arrLength;
         output.limit = this.config.limit;
-        output.pages = mod === 0 ? totalPages : Math.floor(totalPages);
+        output.pages = mod === 0 ? totalPages : Math.ceil(totalPages);
         output.drillDown = {
           "data": response[2][0].item
         };
