@@ -105,19 +105,25 @@ export class GenericService {
         // console.log(content);
         Object.keys(content).map(key => {
           columnNames = Object.keys(content[key]);
-          tableRowContent = this.generateValueOfObj(content[key]);
-          docDefinition.content[1].table.body.push(tableRowContent);
+          
+          if (key <= 2000) {
+            tableRowContent = this.generateValueOfObj(content[key]);
+            docDefinition.content[1].table.body.push(tableRowContent);
+          }
         });
         columnNames.shift();
         docDefinition.content[1].table.body.unshift(columnNames);
         // console.log(JSON.stringify(docDefinition));
         // fs.writeFile('data.json', JSON.stringify(docDefinition, null, 2) , 'utf-8');
-        
-        
-        let pdfDoc = printer.createPdfKitDocument(docDefinition);
-
+  
         console.log("NOw writing to PDF=================>");
-        pdfDoc.pipe(fs.createWriteStream("PDF/Attachment.pdf"));
+        let createStream = fs.createWriteStream("PDF/Attachment.pdf"),
+          pdfDoc = printer.createPdfKitDocument(docDefinition);
+        
+        /*pdfDoc.on("readable", () => {
+          
+        })*/
+        pdfDoc.pipe(createStream);
         pdfDoc.end();
         console.log("Pdf generated successfully");
 
