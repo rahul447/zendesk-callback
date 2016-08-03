@@ -119,9 +119,6 @@ export class GenericService {
         let createStream = fs.createWriteStream("PDF/Attachment.pdf"),
           pdfDoc = printer.createPdfKitDocument(docDefinition);
         
-        /*pdfDoc.on("readable", () => {
-          
-        })*/
         pdfDoc.pipe(createStream);
         pdfDoc.end();
         console.log("Pdf generated successfully");
