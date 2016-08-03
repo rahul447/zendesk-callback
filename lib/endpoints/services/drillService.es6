@@ -91,7 +91,7 @@ export class DrillService {
 
         output.numberOfResults = response[2][0].arrLength;
         output.limit = this.config.limit;
-        output.pages = mod === 0 ? totalPages : Math.round(totalPages);
+        output.pages = mod === 0 ? totalPages : Math.floor(totalPages);
         output.drillDown = {
           "data": response[2][0].item
         };
