@@ -17,12 +17,12 @@ export class EmailService {
        to this e-mail, as it was sent from an unattended e-mail address. For any query or clarification please feel free
         to contact info@cantahealth.com</footer>`,
       "attachments": [{
-        "file": "testMail.pdf",
-        "path": "PDF/Attachment.pdf"
+        "file": "Attachment.csv",
+        "path": "CSV/Attachment.csv"
       }]
     };
 
-    this.genericService.generatePDF(req, res)
+    this.genericService.generatePDF(req)
       .then(() => {
         mailOption.subject = `Focus email for ${req.body.domain} drilldown for user ${req.body.emailId}`;
         this.Nodemailer.send(mailOption)
@@ -50,7 +50,7 @@ export class EmailService {
         to contact info@cantahealth.com</footer>`,
       "attachments": [{
         "file": "testMail.pdf",
-        "path": "PDF/Attachment.pdf"
+        "path": "CSV/Attachment.pdf"
       }]
     };
 

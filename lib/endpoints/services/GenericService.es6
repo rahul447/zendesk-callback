@@ -4,16 +4,9 @@ import ApiError from "../../util/apiError";
 import fs from "fs";
 import Q from "q";
 import request from "request";
+import json2csv from "json2csv";
 
 let protectedGenericInstance,
-  fonts = {
-    "Roboto": {
-      "normal": "fonts/Roboto-Regular.ttf",
-      "bold": "fonts/Roboto-Medium.ttf",
-      "italics": "fonts/Roboto-Italic.ttf",
-      "bolditalics": "fonts/Roboto-Italic.ttf"
-    }
-  },
   repoObj = {
     "collection": "",
     "filter": {},
@@ -28,68 +21,11 @@ export class GenericService {
     GenericService.mongo = mongo;
     GenericService.config = config;
   }
-
-  generatePDF(req, res) {
-    GenericService.loggerInstance.info("=======Generating PDF==========>");
-    let printer = new PDFDocument(fonts),
-      defer = Q.defer(),
-      content, columnNames, tableRowContent,
-      docDefinition = {
-        "pageOrientation": "landscape",
-        "content": [
-          {
-            "text": "Patient details", "style": "title"
-          },
-          {
-            "style": "tableExample",
-            "table": {
-              "body": [
-              ]
-            },
-            "layout": {
-              hLineWidth(i, node) {
-                return (i === 0 || i === node.table.body.length) ? 2 : 1;
-              },
-              vLineWidth(i, node) {
-                return (i === 0 || i === node.table.widths.length) ? 2 : 1;
-              },
-              hLineColor(i, node) {
-                return (i === 0 || i === node.table.body.length) ? "black" : "gray";
-              },
-              vLineColor(i, node) {
-                return (i === 0 || i === node.table.widths.length) ? "black" : "gray";
-              }
-              // paddingLeft: function(i, node) { return 4; },
-              // paddingRight: function(i, node) { return 4; },
-              // paddingTop: function(i, node) { return 2; },
-              // paddingBottom: function(i, node) { return 2; }
-            }
-          }
-        ],
-        "styles": {
-          "header": {
-            "fontSize": 18,
-            "bold": true,
-            "margin": [0, 0, 0, 10]
-          },
-          "subheader": {
-            "fontSize": 16,
-            "bold": true,
-            "margin": [0, 10, 0, 5]
-          },
-          "tableExample": {
-            "margin": [0, 5, 0, 15]
-          },
-          "tableHeader": {
-            "bold": true,
-            "fontSize": 13,
-            "color": "black"
-          }
-        },
-        "defaultStyle": {
-          // alignment: 'justify'
-        }
-      };
+  
+  generatePDF(req) {
+    GenericService.loggerInstance.info("=======Generating CSV==========>");
+    let defer = Q.defer(),
+      projection = `dashboard.${req.body.domain}.groups.portlets.drillDown.data`;
 
     repoObj.collection = "drilldown_data";
     repoObj.filter = {"_id": req.userId};
@@ -100,10 +36,29 @@ export class GenericService {
 
     GenericService.genericRepo.drillData(repoObj)
       .then(resp => {
-        console.log("====Response Data====> ", resp);
-        content = resp[0].value.drillDown.data;
-        // console.log(content);
-        Object.keys(content).map(key => {
+        try {
+          let content = resp.dashboard[req.body.domain].groups[0].portlets[0].drillDown.data,
+            columnNames = Object.keys(content[0]),
+            csv = json2csv({
+              "data": content,
+              "fields": columnNames
+            });
+  
+          fs.writeFile("CSV/attachment.csv", csv, err => {
+            if (err) {
+              console.log("***Error on writing to csv****", err);
+              defer.reject(new ApiError("Internal Server Error", ["Error genrating CSV"], err, 500))
+            }else {
+              console.log("CSV generated successfully");
+              defer.resolve();
+            }
+          });
+        }catch (exp) {
+          console.log("*****Exception Thrown******", exp);
+          defer.reject(exp);
+        }
+        /*Object.keys(content).map(key => {
+>>>>>>> Stashed changes
           columnNames = Object.keys(content[key]);
           
           if (key <= 2000) {
@@ -113,17 +68,22 @@ export class GenericService {
         });
         columnNames.shift();
         docDefinition.content[1].table.body.unshift(columnNames);
+<<<<<<< Updated upstream
         // console.log(JSON.stringify(docDefinition));
         // fs.writeFile('data.json', JSON.stringify(docDefinition, null, 2) , 'utf-8');
         console.log("NOw writing to PDF=================>");
         let createStream = fs.createWriteStream("PDF/Attachment.pdf"),
           pdfDoc = printer.createPdfKitDocument(docDefinition);
         
+<<<<<<< HEAD
         pdfDoc.pipe(createStream);
         pdfDoc.end();
         console.log("Pdf generated successfully");
+=======
+        /*pdfDoc.on("readable", () => {
+          
+        })*/
 
-        defer.resolve(res);
       }, err => {
         defer.reject(new ApiError("Internal Server Error", "DB error", err, 500));
       });
@@ -199,7 +159,7 @@ export class GenericService {
     docDefinition.content[1].table.body.unshift(columnNames);
     console.log(JSON.stringify(docDefinition));
     pdfDoc = printer.createPdfKitDocument(docDefinition);
-    pdfDoc.pipe(fs.createWriteStream("PDF/Attachment.pdf"));
+    pdfDoc.pipe(fs.createWriteStream("CSV/Attachment.pdf"));
     console.log("Pdf generated successfully");
     pdfDoc.end();
     defer.resolve();
