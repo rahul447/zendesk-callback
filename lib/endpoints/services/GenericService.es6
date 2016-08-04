@@ -7,6 +7,14 @@ import request from "request";
 import json2csv from "json2csv";
 
 let protectedGenericInstance,
+  fonts = {
+    "Roboto": {
+      "normal": "fonts/Roboto-Regular.ttf",
+      "bold": "fonts/Roboto-Medium.ttf",
+      "italics": "fonts/Roboto-Italic.ttf",
+      "bolditalics": "fonts/Roboto-Italic.ttf"
+    }
+  },
   repoObj = {
     "collection": "",
     "filter": {},
@@ -21,11 +29,10 @@ export class GenericService {
     GenericService.mongo = mongo;
     GenericService.config = config;
   }
-  
+
   generatePDF(req) {
     GenericService.loggerInstance.info("=======Generating CSV==========>");
-    let defer = Q.defer(),
-      projection = `dashboard.${req.body.domain}.groups.portlets.drillDown.data`;
+    let defer = Q.defer();
 
     repoObj.collection = "drilldown_data";
     repoObj.filter = {"_id": req.userId};
@@ -37,30 +44,35 @@ export class GenericService {
     GenericService.genericRepo.drillData(repoObj)
       .then(resp => {
         try {
-          let content = resp.dashboard[req.body.domain].groups[0].portlets[0].drillDown.data,
+          let content = resp[0].value.drillDown.data,
             columnNames = Object.keys(content[0]),
             csv = json2csv({
               "data": content,
               "fields": columnNames
-            });
-  
-          fs.writeFile("CSV/attachment.csv", csv, err => {
+            }),
+            fStream = fs.createWriteStream("CSV/attachment.csv");
+          
+          fStream.on("open", () => {
+            console.log("File written====>")
+          });
+            
+          /*fs.writeFile("CSV/attachment.csv", csv, err => {
             if (err) {
               console.log("***Error on writing to csv****", err);
-              defer.reject(new ApiError("Internal Server Error", ["Error genrating CSV"], err, 500))
+              defer.reject(new ApiError("Internal Server Error", ["Error genrating CSV"], err, 500));
             }else {
               console.log("CSV generated successfully");
               defer.resolve();
             }
-          });
+          });*/
         }catch (exp) {
           console.log("*****Exception Thrown******", exp);
           defer.reject(exp);
         }
-        /*Object.keys(content).map(key => {
->>>>>>> Stashed changes
+
+        /* Object.keys(content).map(key => {
           columnNames = Object.keys(content[key]);
-          
+
           if (key <= 2000) {
             tableRowContent = this.generateValueOfObj(content[key]);
             docDefinition.content[1].table.body.push(tableRowContent);
@@ -68,9 +80,9 @@ export class GenericService {
         });
         columnNames.shift();
         docDefinition.content[1].table.body.unshift(columnNames);
-<<<<<<< Updated upstream
         // console.log(JSON.stringify(docDefinition));
         // fs.writeFile('data.json', JSON.stringify(docDefinition, null, 2) , 'utf-8');
+<<<<<<< HEAD
         console.log("NOw writing to PDF=================>");
         let createStream = fs.createWriteStream("PDF/Attachment.pdf"),
           pdfDoc = printer.createPdfKitDocument(docDefinition);
@@ -83,6 +95,7 @@ export class GenericService {
         /*pdfDoc.on("readable", () => {
           
         })*/
+
 
       }, err => {
         defer.reject(new ApiError("Internal Server Error", "DB error", err, 500));
