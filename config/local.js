@@ -74,7 +74,7 @@ var environmentVariables = require("./environmentVariables"),
         "version": "baseDstu2"
       }
     },
-    "AUTH_SECRET_KEY": environmentVariables.AUTH_SECRET_KEY,
+    "AUTH_SECRET_KEY": environmentVariables.FOCUS_AUTH_SECRET_KEY,
     "tokenExpireIn": 7200,
     "MaxInactivityTime": 1800
   };
