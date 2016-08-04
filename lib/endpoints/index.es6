@@ -1,9 +1,7 @@
 "use strict";
 
-import merge from "deepmerge";
 import express from "express";
 import mongodb from "mongodb";
-import Q from "q";
 import loggerInstance from "../util/FocusApiLogger";
 import {getGenericRepoInstance} from "../endpoints/generic/GenericRepository";
 import {DomainService} from "./services/domainService";
@@ -23,7 +21,7 @@ let router = express.Router(),
   nodeEnv = NODE_ENV || "local",
   config = Object.freeze(require("../../config/" + nodeEnv)),
   domainRoute = router.route("/domain/:name"),
-  drillRoute = router.route("/domain/:name/:group/:portlet"),
+  drillRoute = router.route("/domain/:name/:group/:portlet/:pageNumber"),
   leadershipRoute = router.route("/leadership"),
   emailRoute = router.route("/sendmail"),
   filterEmailRoute = router.route("/sendfilteredEmail"),
@@ -38,11 +36,11 @@ let router = express.Router(),
   redis = new RedisCache({"redisdb": config.caching, "logger": loggerInstance}),
   genericRepo = getGenericRepoInstance({"config": config, "mongodb": mongodb, "loggerInstance": loggerInstance}),
   genericService = getGenericServiceInstance(genericRepo, loggerInstance, mongodb, config),
-  domainService = new DomainService(genericRepo, loggerInstance, Q, merge),
+  domainService = new DomainService(genericRepo, loggerInstance),
   loginService = new LoginService(genericRepo, loggerInstance, redis, config),
   logoutService = new LogoutService(loggerInstance, redis, config),
-  leadershipService = new LeaderShipService(genericRepo, loggerInstance, Q, merge),
-  drillService = new DrillService(genericRepo, loggerInstance, Q, merge),
+  leadershipService = new LeaderShipService(genericRepo, loggerInstance),
+  drillService = new DrillService(genericRepo, loggerInstance, config),
   nodeMailerInstance = new NodeMailer(config.smtp),
   entitlementInstance = getEntitlementInstance(genericRepo, loggerInstance),
   emailService = new EmailService(loggerInstance, genericService, nodeMailerInstance),

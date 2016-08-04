@@ -100,6 +100,58 @@ export class GenericRepository {
     );
   }
 
+  paginate(param) {
+    this.loggerInstance.info("Retreiving from db");
+    console.log(param);
+
+    const {collection, filter, _start, _end, _group, _portlet, _domain} = param,
+      aggregateObj = [
+        {
+          "$match": filter
+        },
+        {
+          "$project": {
+            "data": {
+              "$arrayElemAt": [`$dashboard.${_domain}.groups`, _group]
+            }
+          }
+        },
+        {
+          "$project": {
+            "value": {
+              "$arrayElemAt": ["$data.portlets", _portlet]
+            }
+          }
+        },
+        {
+          "$project": {
+            "item": {
+              "$slice": ["$value.drillDown.data", _start, _end]
+            },
+            "arrLength": {
+              "$size": "$value.drillDown.data"
+            }
+          }
+        }
+      ];
+
+    return this.db_
+      .catch(err => {
+        this.loggerInstance.debug("Connection to db is broken at create: ", err);
+        return this.connectToDb_();
+      })
+      .then(db => {
+        this.loggerInstance.debug("Successfully connected");
+        return Q.ninvoke(db.collection(collection), "aggregate", aggregateObj);
+      })
+      .then(findResult => {
+        return findResult;
+      }, err => {
+        return err;
+      });
+
+  }
+
   retrieve(param) {
 
     this.loggerInstance.info("Retreiving from db");

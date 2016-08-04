@@ -75,6 +75,7 @@ var environmentVariables = require("./environmentVariables"),
       }
     },
     "AUTH_SECRET_KEY": environmentVariables.FOCUS_AUTH_SECRET_KEY,
+    "limit": 50,
     "tokenExpireIn": 7200,
     "MaxInactivityTime": 1800
   };
