@@ -18,7 +18,11 @@ var environmentVariables = require("./environmentVariables"),
         },
         {
           "level": environmentVariables.FOCUS_LOGGING_LEVEL,
-          "path": "/var/log/focus/focus-api.log"
+          "path": "/var/log/focus/focus-api-debug.log"
+        },
+        {
+          "level": "info",
+          "path": "/var/log/focus/focus-api-info.log"
         }
       ]
     },
