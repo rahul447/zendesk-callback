@@ -71,39 +71,39 @@ export class DrillService {
 
   getDrillDataUsers(req) {
     let args = {
-      "collection": "",
-      "filter": {},
-      "projection": {}
-    };
+        "collection": "",
+        "filter": {},
+        "projection": {}
+      },
+      projection = `dashboard.${req.params.name}.groups`;
 
     this.loggerInstance.info("=========get Drill Data=====USERS======>");
 
     args.collection = "users";
     args.filter = {"_id": req.userId};
-    args._domain = req.params.name;
-    args._group = req.params.group;
-    args._portlet = req.params.portlet;
+    args.projection[projection] = 1;
+    args.projection.lastUpdatedDate = 1;
 
-    return this.genericRepo_.getDrill(args);
+    return this.genericRepo_.retrieve(args);
   }
 
   getDrillPreferences(req) {
     let args = {
-      "collection": "",
-      "filter": {},
-      "projection": {}
-    };
+        "collection": "",
+        "filter": {},
+        "projection": {}
+      },
+      projection = `dashboard.${req.params.name}.groups`;
 
     this.loggerInstance.info("=========get Drill Preferences========>");
 
     args.collection = "preferences";
     args.filter = {"userId": req.userId};
     // _id in preferences collection indicates preference id. We don't need that.
-    args._domain = req.params.name;
-    args._group = req.params.group;
-    args._portlet = req.params.portlet;
+    args.projection = {"_id": 0};
+    args.projection[projection] = 1;
 
-    return this.genericRepo_.getDrill(args);
+    return this.genericRepo_.retrieve(args);
   }
 
   getDrillDashboard(req, res, next) {
@@ -135,7 +135,7 @@ export class DrillService {
       return next(new ApiError("Internal Server Error", "DB error", err, 500));
     })
       .catch(error => {
-        this.loggerInstance.debug(`Caught Error ${DrillService.name}.getDrillDashboard `, error);
+        this.loggerInstance.debug(`Caught Error ${DrillService.name}.getDrillDashboard `, error.stack);
         return res.status(500).send(error);
       })
     .done();
