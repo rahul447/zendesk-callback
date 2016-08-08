@@ -1,5 +1,4 @@
 node_modules
-PDF
 test_results.txt
 dist/**/*.js
 dist/**/*.js.map
@@ -10,7 +9,7 @@ npm-debug.log
 ._*
 .DS_Store
 .git
-
+CSV
 .idea/
 .idea/*
 
