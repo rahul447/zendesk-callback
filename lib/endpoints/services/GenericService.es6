@@ -175,7 +175,7 @@ export class GenericService {
     docDefinition.content[1].table.body.unshift(columnNames);
     console.log(JSON.stringify(docDefinition));
     pdfDoc = printer.createPdfKitDocument(docDefinition);
-    pdfDoc.pipe(fs.createWriteStream("CSV/Attachment.pdf"));
+    pdfDoc.pipe(fs.createWriteStream("PDF/Attachment.pdf"));
     console.log("Pdf generated successfully");
     pdfDoc.end();
     defer.resolve();

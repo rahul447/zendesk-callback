@@ -49,8 +49,8 @@ export class EmailService {
        to this e-mail, as it was sent from an unattended e-mail address. For any query or clarification please feel free
         to contact info@cantahealth.com</footer>`,
       "attachments": [{
-        "file": "testMail.pdf",
-        "path": "CSV/Attachment.pdf"
+        "file": "Attachment.pdf",
+        "path": "PDF/Attachment.pdf"
       }]
     };
 
