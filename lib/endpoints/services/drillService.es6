@@ -11,7 +11,7 @@ export class DrillService {
     this.config = config;
   }
 
-  /* getDrillData(req) {
+  getDrillDown(req) {
     this.loggerInstance.info("=========get Drill Data===========>", req.userId);
 
     args.collection = "drilldown_data";
@@ -19,10 +19,9 @@ export class DrillService {
     args._domain = req.params.name;
     args._group = req.params.group;
     args._portlet = req.params.portlet;
-
-<<<<<<< HEAD
+    
     return this.genericRepo_.retrieve(args);
-  } */
+  }
 
   getDrillData(req) {
     let args = {
