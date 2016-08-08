@@ -13,13 +13,17 @@ export class DrillService {
 
   getDrillDown(req) {
     this.loggerInstance.info("=========get Drill Data===========>", req.userId);
+    let args = {
+      "collection": "",
+      "filter": {}
+    };
 
     args.collection = "drilldown_data";
     args.filter = {"_id": req.userId};
     args._domain = req.params.name;
     args._group = req.params.group;
     args._portlet = req.params.portlet;
-    
+
     return this.genericRepo_.retrieve(args);
   }
 
@@ -50,11 +54,10 @@ export class DrillService {
 
   getDrillDataUsers(req) {
     let args = {
-        "collection": "",
-        "filter": {},
-        "projection": {}
-      },
-      projection = `dashboard.${req.params.name}.groups`;
+      "collection": "",
+      "filter": {},
+      "projection": {}
+    };
 
     this.loggerInstance.info("=========get Drill Data=====USERS======>");
 
@@ -64,16 +67,15 @@ export class DrillService {
     args._group = req.params.group;
     args._portlet = req.params.portlet;
 
-    return this.genericRepo_.drillData(args);
+    return this.genericRepo_.getDrill(args);
   }
 
   getDrillPreferences(req) {
     let args = {
-        "collection": "",
-        "filter": {},
-        "projection": {}
-      },
-      projection = `dashboard.${req.params.name}.groups`;
+      "collection": "",
+      "filter": {},
+      "projection": {}
+    };
 
     this.loggerInstance.info("=========get Drill Preferences========>");
 
@@ -84,7 +86,7 @@ export class DrillService {
     args._group = req.params.group;
     args._portlet = req.params.portlet;
 
-    return this.genericRepo_.drillData(args);
+    return this.genericRepo_.getDrill(args);
   }
 
   getDrillDashboard(req, res, next) {

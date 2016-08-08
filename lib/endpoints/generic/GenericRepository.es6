@@ -99,11 +99,11 @@ export class GenericRepository {
         .lookupForEventContainer(event)
     );
   }
-  
+
   paginate(param) {
     this.loggerInstance.info("Retreiving from db");
     console.log(param);
-    
+
     const {collection, filter, _start, _end, _group, _portlet, _domain} = param,
       aggregateObj = [
         {
@@ -134,7 +134,7 @@ export class GenericRepository {
           }
         }
       ];
-    
+
     return this.db_
       .catch(err => {
         this.loggerInstance.debug("Connection to db is broken at create: ", err);
@@ -149,7 +149,6 @@ export class GenericRepository {
       }, err => {
         return err;
       });
-    
   }
 
   retrieve(param) {
@@ -206,6 +205,56 @@ export class GenericRepository {
       }, err => {
         return err;
       });
+  }
+
+  getDrill(param) {
+    this.loggerInstance.info("Retreiving from db");
+    console.log(param);
+
+    const {collection, filter, _group, _portlet, _domain} = param,
+      aggregateObj = [
+        {
+          "$match": filter
+        },
+        {
+          "$project": {
+            "data": {
+              "$arrayElemAt": [`$dashboard.${_domain}.groups`, Number(_group)]
+            }
+          }
+        },
+        {
+          "$project": {
+            "value": {
+              "$arrayElemAt": ["$data.portlets", Number(_portlet)]
+            }
+          }
+        },
+        {
+          "$project": {
+            "item": "$value.drillDown.data",
+            "arrLength": {
+              "$size": "$value.drillDown.data"
+            }
+          }
+        }
+      ];
+
+    return this.db_
+      .catch(err => {
+        this.loggerInstance.debug("Connection to db is broken at create: ", err);
+        return this.connectToDb_();
+      })
+      .then(db => {
+        this.loggerInstance.debug("Successfully connected");
+        return Q.ninvoke(db.collection(collection), "aggregate", aggregateObj);
+      })
+      .then(findResult => {
+        return findResult;
+      }, err => {
+        return err;
+      });
+
   }
 
   insertMany(param) {

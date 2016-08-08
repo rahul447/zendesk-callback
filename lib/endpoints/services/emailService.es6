@@ -34,8 +34,8 @@ export class EmailService {
             return next(new ApiError("Internal Server Error", "Mail failure", err, 500));
           });
       }, err => {
-        console.log("Error generating pdf");
-        return next(new ApiError("Internal Server Error", "Error generating pdf", err, 500));
+        console.log("Error generating CSV");
+        return next(new ApiError("Internal Server Error", "Error generating CSV", err, 500));
       });
   }
 

@@ -41,10 +41,10 @@ export class GenericService {
     repoObj._portlet = req.body.portletId;
     console.log(repoObj);
 
-    GenericService.genericRepo.drillData(repoObj)
+    GenericService.genericRepo.getDrill(repoObj)
       .then(resp => {
         try {
-          let content = resp[0].value.drillDown.data,
+          let content = resp[0].item,
             columnNames = Object.keys(content[0]),
             fStream = fs.createWriteStream("CSV/attachment.csv"),
             csv = json2csv({
@@ -93,21 +93,13 @@ export class GenericService {
         docDefinition.content[1].table.body.unshift(columnNames);
         // console.log(JSON.stringify(docDefinition));
         // fs.writeFile('data.json', JSON.stringify(docDefinition, null, 2) , 'utf-8');
-<<<<<<< HEAD
         console.log("NOw writing to PDF=================>");
         let createStream = fs.createWriteStream("PDF/Attachment.pdf"),
           pdfDoc = printer.createPdfKitDocument(docDefinition);
-        
-<<<<<<< HEAD
         pdfDoc.pipe(createStream);
         pdfDoc.end();
         console.log("Pdf generated successfully");
-=======
-        /*pdfDoc.on("readable", () => {
-          
-        })*/
-
-
+        */
       }, err => {
         defer.reject(new ApiError("Internal Server Error", "DB error", err, 500));
       });
