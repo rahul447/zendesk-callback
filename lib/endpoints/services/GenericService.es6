@@ -46,17 +46,28 @@ export class GenericService {
         try {
           let content = resp[0].value.drillDown.data,
             columnNames = Object.keys(content[0]),
+            fStream = fs.createWriteStream("CSV/attachment.csv"),
             csv = json2csv({
               "data": content,
               "fields": columnNames
-            }),
-            fStream = fs.createWriteStream("CSV/attachment.csv");
-          
+            });
+
           fStream.on("open", () => {
-            console.log("File written====>")
-          });
-            
-          /*fs.writeFile("CSV/attachment.csv", csv, err => {
+            GenericService.loggerInstance.info("File created====>");
+            fStream.write(csv);
+            fStream.end();
+          })
+            .on("finish", () => {
+              GenericService.loggerInstance.info("Data Written Successfully=======>");
+              GenericService.loggerInstance.info("CSV Generated");
+              defer.resolve();
+            })
+            .on("error", err => {
+              GenericService.loggerInstance.info("Error While Writing to CSV ", err);
+              defer.reject(err);
+            });
+
+          /* fs.writeFile("CSV/attachment.csv", csv, err => {
             if (err) {
               console.log("***Error on writing to csv****", err);
               defer.reject(new ApiError("Internal Server Error", ["Error genrating CSV"], err, 500));
@@ -64,7 +75,7 @@ export class GenericService {
               console.log("CSV generated successfully");
               defer.resolve();
             }
-          });*/
+          }); */
         }catch (exp) {
           console.log("*****Exception Thrown******", exp);
           defer.reject(exp);
