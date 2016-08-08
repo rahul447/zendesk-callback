@@ -47,6 +47,23 @@ export class DrillService {
     return this.genericRepo_.paginate(args);
   }
 
+  getAllDrill(req) {
+    let args = {
+      "collection": "",
+      "filter": {}
+    };
+
+    this.loggerInstance.info("=========get Drill Data===========>", req.userId);
+
+    args.collection = "drilldown_data";
+    args.filter = {"_id": req.userId};
+    args._domain = req.params.name;
+    args._group = Number(req.params.group);
+    args._portlet = Number(req.params.portlet);
+
+    return this.genericRepo_.getDrill(args);
+  }
+
   getDrillDataUsers(req) {
     let args = {
         "collection": "",
@@ -90,19 +107,15 @@ export class DrillService {
     Q.all([
       this.getDrillDataUsers(req),
       this.getDrillPreferences(req),
-      this.getDrillData(req)
+      this.getAllDrill(req)
     ])
     .then(response => {
       if (response) {
         let drillUsers = response[0].dashboard[req.params.name].groups[req.params.group].portlets[req.params.portlet],
           drillPref = response[1].dashboard[req.params.name].groups[req.params.group].portlets[req.params.portlet],
-          output = merge(drillUsers, drillPref),
-          totalPages = response[2][0].arrLength / this.config.limit,
-          mod = response[2][0].arrLength % this.config.limit;
+          output = merge(drillUsers, drillPref);
 
         output.numberOfResults = response[2][0].arrLength;
-        output.limit = this.config.limit;
-        output.pages = mod === 0 ? totalPages : Math.ceil(totalPages);
         output.drillDown = {
           "data": response[2][0].item
         };
