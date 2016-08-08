@@ -30,7 +30,7 @@ export class GenericService {
     GenericService.config = config;
   }
 
-  generatePDF(req) {
+  generateCSV(req) {
     GenericService.loggerInstance.info("=======Generating CSV==========>");
     let defer = Q.defer();
 

@@ -22,7 +22,7 @@ export class EmailService {
       }]
     };
 
-    this.genericService.generatePDF(req)
+    this.genericService.generateCSV(req)
       .then(() => {
         mailOption.subject = `Focus email for ${req.body.domain} drilldown for user ${req.body.emailId}`;
         this.Nodemailer.send(mailOption)

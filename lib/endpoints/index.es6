@@ -71,7 +71,7 @@ filterEmailRoute
   .post(emailService.sendFilteredDataMail.bind(emailService));
 
 pdfRoute
-  .get(genericService.generatePDF.bind(genericService));
+  .get(genericService.generateCSV.bind(genericService));
 
 getAction
   .get(entitlementInstance.getLeaderAction.bind(entitlementInstance))
