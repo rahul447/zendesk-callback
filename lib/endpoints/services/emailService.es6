@@ -17,8 +17,8 @@ export class EmailService {
        to this e-mail, as it was sent from an unattended e-mail address. For any query or clarification please feel free
         to contact info@cantahealth.com</footer>`,
       "attachments": [{
-        "file": "Attachment.csv",
-        "path": "CSV/Attachment.csv"
+        "file": "attachment.csv",
+        "path": "CSV/attachment.csv"
       }]
     };
 
