@@ -11,16 +11,21 @@ export class DrillService {
     this.config = config;
   }
 
-  /* getDrillData(req) {
+  getDrillDown(req) {
     this.loggerInstance.info("=========get Drill Data===========>", req.userId);
-    let projection = `dashboard.${req.params.name}.groups`;
+    let args = {
+      "collection": "",
+      "filter": {}
+    };
 
     args.collection = "drilldown_data";
     args.filter = {"_id": req.userId};
-    args.projection[projection] = 1;
+    args._domain = req.params.name;
+    args._group = req.params.group;
+    args._portlet = req.params.portlet;
 
     return this.genericRepo_.retrieve(args);
-  } */
+  }
 
   getDrillData(req) {
     let args = {
@@ -66,39 +71,39 @@ export class DrillService {
 
   getDrillDataUsers(req) {
     let args = {
-        "collection": "",
-        "filter": {},
-        "projection": {}
-      },
-      projection = `dashboard.${req.params.name}.groups`;
+      "collection": "",
+      "filter": {},
+      "projection": {}
+    };
 
     this.loggerInstance.info("=========get Drill Data=====USERS======>");
 
     args.collection = "users";
     args.filter = {"_id": req.userId};
-    args.projection[projection] = 1;
-    args.projection.lastUpdatedDate = 1;
+    args._domain = req.params.name;
+    args._group = req.params.group;
+    args._portlet = req.params.portlet;
 
-    return this.genericRepo_.retrieve(args);
+    return this.genericRepo_.getDrill(args);
   }
 
   getDrillPreferences(req) {
     let args = {
-        "collection": "",
-        "filter": {},
-        "projection": {}
-      },
-      projection = `dashboard.${req.params.name}.groups`;
+      "collection": "",
+      "filter": {},
+      "projection": {}
+    };
 
     this.loggerInstance.info("=========get Drill Preferences========>");
 
     args.collection = "preferences";
     args.filter = {"userId": req.userId};
     // _id in preferences collection indicates preference id. We don't need that.
-    args.projection = {"_id": 0};
-    args.projection[projection] = 1;
+    args._domain = req.params.name;
+    args._group = req.params.group;
+    args._portlet = req.params.portlet;
 
-    return this.genericRepo_.retrieve(args);
+    return this.genericRepo_.getDrill(args);
   }
 
   getDrillDashboard(req, res, next) {

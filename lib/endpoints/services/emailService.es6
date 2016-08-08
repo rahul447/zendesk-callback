@@ -17,12 +17,12 @@ export class EmailService {
        to this e-mail, as it was sent from an unattended e-mail address. For any query or clarification please feel free
         to contact info@cantahealth.com</footer>`,
       "attachments": [{
-        "file": "testMail.pdf",
-        "path": "PDF/Attachment.pdf"
+        "file": "attachment.csv",
+        "path": "CSV/attachment.csv"
       }]
     };
 
-    this.genericService.generatePDF(req, res)
+    this.genericService.generateCSV(req)
       .then(() => {
         mailOption.subject = `Focus email for ${req.body.domain} drilldown for user ${req.body.emailId}`;
         this.Nodemailer.send(mailOption)
@@ -34,8 +34,8 @@ export class EmailService {
             return next(new ApiError("Internal Server Error", "Mail failure", err, 500));
           });
       }, err => {
-        console.log("Error generating pdf");
-        return next(new ApiError("Internal Server Error", "Error generating pdf", err, 500));
+        console.log("Error generating CSV");
+        return next(new ApiError("Internal Server Error", "Error generating CSV", err, 500));
       });
   }
 
@@ -49,7 +49,7 @@ export class EmailService {
        to this e-mail, as it was sent from an unattended e-mail address. For any query or clarification please feel free
         to contact info@cantahealth.com</footer>`,
       "attachments": [{
-        "file": "testMail.pdf",
+        "file": "Attachment.pdf",
         "path": "PDF/Attachment.pdf"
       }]
     };

@@ -4,6 +4,7 @@ import ApiError from "../../util/apiError";
 import fs from "fs";
 import Q from "q";
 import request from "request";
+import json2csv from "json2csv";
 
 let protectedGenericInstance,
   fonts = {
@@ -29,93 +30,76 @@ export class GenericService {
     GenericService.config = config;
   }
 
-  generatePDF(req, res) {
-    GenericService.loggerInstance.info("=======Generating PDF==========>");
-    let printer = new PDFDocument(fonts),
-      defer = Q.defer(),
-      projection = `dashboard.${req.body.domain}.groups.portlets.drillDown.data`,
-      content, columnNames, tableRowContent,
-      docDefinition = {
-        "pageOrientation": "landscape",
-        "content": [
-          {
-            "text": "Patient details", "style": "title"
-          },
-          {
-            "style": "tableExample",
-            "table": {
-              "body": [
-              ]
-            },
-            "layout": {
-              hLineWidth(i, node) {
-                return (i === 0 || i === node.table.body.length) ? 2 : 1;
-              },
-              vLineWidth(i, node) {
-                return (i === 0 || i === node.table.widths.length) ? 2 : 1;
-              },
-              hLineColor(i, node) {
-                return (i === 0 || i === node.table.body.length) ? "black" : "gray";
-              },
-              vLineColor(i, node) {
-                return (i === 0 || i === node.table.widths.length) ? "black" : "gray";
-              }
-              // paddingLeft: function(i, node) { return 4; },
-              // paddingRight: function(i, node) { return 4; },
-              // paddingTop: function(i, node) { return 2; },
-              // paddingBottom: function(i, node) { return 2; }
-            }
-          }
-        ],
-        "styles": {
-          "header": {
-            "fontSize": 18,
-            "bold": true,
-            "margin": [0, 0, 0, 10]
-          },
-          "subheader": {
-            "fontSize": 16,
-            "bold": true,
-            "margin": [0, 10, 0, 5]
-          },
-          "tableExample": {
-            "margin": [0, 5, 0, 15]
-          },
-          "tableHeader": {
-            "bold": true,
-            "fontSize": 13,
-            "color": "black"
-          }
-        },
-        "defaultStyle": {
-          // alignment: 'justify'
-        }
-      };
+  generateCSV(req) {
+    GenericService.loggerInstance.info("=======Generating CSV==========>");
+    let defer = Q.defer();
 
     repoObj.collection = "drilldown_data";
     repoObj.filter = {"_id": req.userId};
-    repoObj.projection[projection] = 1;
-    repoObj.projection.lastUpdatedDate = 1;
+    repoObj._domain = req.body.domain;
+    repoObj._group = req.body.groupId;
+    repoObj._portlet = req.body.portletId;
     console.log(repoObj);
 
-    GenericService.genericRepo.retrieve(repoObj)
+    GenericService.genericRepo.getDrill(repoObj)
       .then(resp => {
-        content = resp.dashboard[req.body.domain].groups[0].portlets[0].drillDown.data;
-        Object.keys(content).map(key => {
+        try {
+          let content = resp[0].item,
+            columnNames = Object.keys(content[0]),
+            fStream = fs.createWriteStream("CSV/attachment.csv"),
+            csv = json2csv({
+              "data": content,
+              "fields": columnNames
+            });
+
+          fStream.on("open", () => {
+            GenericService.loggerInstance.info("File created====>");
+            fStream.write(csv);
+            fStream.end();
+          })
+            .on("finish", () => {
+              GenericService.loggerInstance.info("Data Written Successfully=======>");
+              GenericService.loggerInstance.info("CSV Generated");
+              defer.resolve();
+            })
+            .on("error", err => {
+              GenericService.loggerInstance.info("Error While Writing to CSV ", err);
+              defer.reject(err);
+            });
+
+          /* fs.writeFile("CSV/attachment.csv", csv, err => {
+            if (err) {
+              console.log("***Error on writing to csv****", err);
+              defer.reject(new ApiError("Internal Server Error", ["Error genrating CSV"], err, 500));
+            }else {
+              console.log("CSV generated successfully");
+              defer.resolve();
+            }
+          }); */
+        }catch (exp) {
+          console.log("*****Exception Thrown******", exp);
+          defer.reject(exp);
+        }
+
+        /* Object.keys(content).map(key => {
           columnNames = Object.keys(content[key]);
-          tableRowContent = this.generateValueOfObj(content[key]);
-          docDefinition.content[1].table.body.push(tableRowContent);
+
+          if (key <= 2000) {
+            tableRowContent = this.generateValueOfObj(content[key]);
+            docDefinition.content[1].table.body.push(tableRowContent);
+          }
         });
         columnNames.shift();
         docDefinition.content[1].table.body.unshift(columnNames);
-        console.log(JSON.stringify(docDefinition));
-        let pdfDoc = printer.createPdfKitDocument(docDefinition);
-
-        pdfDoc.pipe(fs.createWriteStream("PDF/Attachment.pdf"));
+        // console.log(JSON.stringify(docDefinition));
+        // fs.writeFile('data.json', JSON.stringify(docDefinition, null, 2) , 'utf-8');
+        console.log("NOw writing to PDF=================>");
+        let createStream = fs.createWriteStream("PDF/Attachment.pdf"),
+          pdfDoc = printer.createPdfKitDocument(docDefinition);
+        pdfDoc.pipe(createStream);
         pdfDoc.end();
         console.log("Pdf generated successfully");
-
-        defer.resolve(res);
+        */
       }, err => {
         defer.reject(new ApiError("Internal Server Error", "DB error", err, 500));
       });
@@ -179,10 +163,9 @@ export class GenericService {
           // alignment: 'justify'
         }
       },
-      pdfDoc,
-      resp = req.body.data;
+      pdfDoc;
 
-    content = resp;
+    content = req.body.data;
     Object.keys(content).map(key => {
       columnNames = Object.keys(content[key]);
       tableRowContent = this.generateValueOfObj(content[key]);
