@@ -1,4 +1,5 @@
 node_modules
+PDF
 test_results.txt
 dist/**/*.js
 dist/**/*.js.map
