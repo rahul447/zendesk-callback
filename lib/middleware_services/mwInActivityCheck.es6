@@ -26,6 +26,7 @@ function mwInActivityCheck(req, res, next) {
           let repeatToken = req.headers.authorization.split(" ")[1];
 
           if (repeatToken !== user.token) {
+            loggerInstance.debug("Token Mismatch");
             return next(new ApiError("Internal Server Error", "Invalid token", "Invalid token", 401));
           }
         }
@@ -38,7 +39,6 @@ function mwInActivityCheck(req, res, next) {
           redis.deleteKey(req.user.userEmail)
             .then(success => {
               loggerInstance.debug("======User logged out successfully===>", success);
-              console.log("======User logged out successfully===>", success);
               return next(new ApiError("Unauthorized", "Invalid token", "Session timeout", 401));
             }, err => {
               loggerInstance.debug("===Error while logging out=>", err);
@@ -61,6 +61,7 @@ function mwInActivityCheck(req, res, next) {
             return next(new ApiError("Internal Server Error", "Redis Server Error", tokenNotSet, 500));
           });
       }else {
+        loggerInstance.debug("User not authorized");
         return next(new ApiError("Unauthorized", "User not logged in", "", 401));
       }
     }, err => {

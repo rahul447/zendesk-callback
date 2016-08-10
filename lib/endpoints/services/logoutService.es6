@@ -10,7 +10,7 @@ export class LogoutService {
   }
 
   userLogout(req, res, next) {
-    this.loggerInstance.debug("=====User Logout======> ", req.body.emailID);
+    this.loggerInstance.info("=====User Logout======> ", req.body.emailID);
     this.redis.deleteKey(req.body.emailID)
       .then(success => {
         this.loggerInstance.debug("======User logged out successfully===>", success);

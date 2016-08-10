@@ -17,7 +17,7 @@ export class LeaderShipService {
   }
 
   getLeadershipData() {
-    this.loggerInstance.info("=====get leadership Data======>");
+    this.loggerInstance.info(`$$$ ${LeaderShipService.name} getLeadershipData() call`);
     args.collection = "leadership";
     args.filter = {};
     args.projection = {"dashboard.leadership": 1};
@@ -27,7 +27,7 @@ export class LeaderShipService {
   }
 
   getLeadershipPreferences(req) {
-    this.loggerInstance.info("=====get leadership preferences======>");
+    this.loggerInstance.info(`$$$ ${LeaderShipService.name} getLeadershipPreferences() call`);
     args.collection = "preferences";
     args.filter = {"userId": req.userId};
     // _id in preferences collection indicates preference id. We don't need that.
@@ -37,7 +37,7 @@ export class LeaderShipService {
   }
 
   getLeadershipDashboard(req, res, next) {
-    this.loggerInstance.info("====get leadership dashboard===========>");
+    this.loggerInstance.info(`$$$ ${LeaderShipService.name} getLeadershipDashboard() call`);
 
     let content;
 
@@ -47,14 +47,15 @@ export class LeaderShipService {
     ])
     .then(response => {
       if (response) {
-        console.log("==================leader===========>");
+        this.loggerInstance.debug(`$$$ ${LeaderShipService.name} Q.all promise success`);
         console.log(response);
         content = merge(response[0], response[1]);
         return res.status(200).send(content);
       }
+      this.loggerInstance.debug(`$$$ ${LeaderShipService.name} getLeadershipDashboard() Data not Found`);
       return next(new ApiError("ReferenceError", "Data not Found", response, 404));
     }, err => {
-      console.log("Error Retreiving leadership data");
+      this.loggerInstance.debug("Error Retreiving leadership data");
       return next(new ApiError("Internal Server Error", "DB error", err, 500));
     })
     .done();

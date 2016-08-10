@@ -58,7 +58,7 @@ export class DrillService {
       "filter": {}
     };
 
-    this.loggerInstance.info("=========get Drill Data===========>", req.userId);
+    this.loggerInstance.info(`$$$ ${DrillService.name} getAllDrill for =>`, req.userId);
 
     args.collection = "drilldown_data";
     args.filter = {"_id": req.userId};
@@ -77,7 +77,7 @@ export class DrillService {
       },
       projection = `dashboard.${req.params.name}.groups`;
 
-    this.loggerInstance.info("=========get Drill Data=====USERS======>");
+    this.loggerInstance.info(`$$$ ${DrillService.name} getDrillDataUsers() ===>`);
 
     args.collection = "users";
     args.filter = {"_id": req.userId};
@@ -95,7 +95,7 @@ export class DrillService {
       },
       projection = `dashboard.${req.params.name}.groups`;
 
-    this.loggerInstance.info("=========get Drill Preferences========>");
+    this.loggerInstance.info(`$$$ ${DrillService.name} getDrillPreferences() ==>`);
 
     args.collection = "preferences";
     args.filter = {"userId": req.userId};
@@ -107,7 +107,7 @@ export class DrillService {
   }
 
   getDrillDashboard(req, res, next) {
-    this.loggerInstance.info("=========get Drill Dashboard========>");
+    this.loggerInstance.info(`$$$ ${DrillService.name} getDrillDashboard() ==>`);
 
     Q.all([
       this.getDrillDataUsers(req),
@@ -129,9 +129,10 @@ export class DrillService {
         output.lastUpdatedDate = response[0].lastUpdatedDate;
         return res.status(200).send(output);
       }
+      this.loggerInstance.debug(`$$$ ${DrillService.name} getDrillDashboard() => Data not Found`);
       return next(new ApiError("ReferenceError", "Data not Found", response, 404));
     }, err => {
-      console.log("Error Retreiving DrillDown data");
+      this.loggerInstance.debug("Error Retreiving DrillDown data for => %s Error %s", req.userId, err);
       return next(new ApiError("Internal Server Error", "DB error", err, 500));
     })
       .catch(error => {
