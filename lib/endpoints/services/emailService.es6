@@ -10,12 +10,12 @@ export class EmailService {
   sendmail(req, res, next) {
     let mailOption = {
       "to": req.body.to,
-      "from": "info@cantahealth.com",
-      "text": "Hello MDOffice",
+      "from": "eccpa@cantahealth.com",
+      "text": "Hello ECCPA",
       "html": `<footer>
       The data displayed in this email is the result of drill down from ${req.body.domain} dashboard.Please do not reply
        to this e-mail, as it was sent from an unattended e-mail address. For any query or clarification please feel free
-        to contact info@cantahealth.com</footer>`,
+        to contact eccpa@cantahealth.com</footer>`,
       "attachments": [{
         "file": "attachment.csv",
         "path": "CSV/attachment.csv"
@@ -42,12 +42,12 @@ export class EmailService {
   sendFilteredDataMail(req, res, next) {
     let mailOption = {
       "to": req.body.to,
-      "from": "mdoffice@cantahealth.com",
-      "text": "Hello MDOffice",
+      "from": "eccpa@cantahealth.com",
+      "text": "Hello ECCPA",
       "html": `<footer>
       The data displayed in this email is the result of drill down from ${req.body.domain} dashboard.Please do not reply
        to this e-mail, as it was sent from an unattended e-mail address. For any query or clarification please feel free
-        to contact info@cantahealth.com</footer>`,
+        to contact eccpa@cantahealth.com</footer>`,
       "attachments": [{
         "file": "Attachment.pdf",
         "path": "PDF/Attachment.pdf"
@@ -62,7 +62,7 @@ export class EmailService {
             console.log("Mail sent Successfully");
             res.status(200).send(resp);
           }, err => {
-            console.log("Mail not sent");
+            console.log("Mail not sent", err);
             return next(new ApiError("Internal Server Error", "Mail failure", err, 500));
           });
       }, err => {
