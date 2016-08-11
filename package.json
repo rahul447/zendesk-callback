@@ -26,7 +26,7 @@
     "body-parser": "^1.15.0",
     "ch-logger": "2.3.0",
     "ch-nodemailer": "^1.1.0",
-    "ch-redis-cache": "^1.6.0",
+    "ch-redis-cache": "^1.6.1",
     "deepmerge": "^0.2.10",
     "express": "^4.13.4",
     "express-domain-middleware": "^0.1.0",
