@@ -21,7 +21,7 @@ export class LoginService {
   }
 
   login(req, res, next) {
-
+    this.loggerInstance.info(`$$$ ${LoginService.name} login() call for => `, req.body.emailID);
     let encryptedPassword = crypto
       .createHash("md5")
       .update(req.body.password)
@@ -42,6 +42,7 @@ export class LoginService {
     this.genericRepo_.retrieve(args)
       .then(result => {
         if (result) {
+          this.loggerInstance.debug(`$$$ ${LoginService.name} User Found in db`);
           args.collection = "preferences";
           args.filter = {
             "_id": result.preferenceId
@@ -55,33 +56,37 @@ export class LoginService {
           this.genericRepo_.retrieve(args)
             .then(response => {
               if (response) {
+                this.loggerInstance.debug(`$$$ ${LoginService.name} Preferences found for user`);
                 let content = Object.assign({}, result, response);
 
                 Reflect.deleteProperty(content, "preferenceId");
                 return res.status(200).send(content);
               }
+              this.loggerInstance.debug(`$$$ ${LoginService.name} User Preferences not found`);
               return next(new ApiError("ReferenceError", "User Data not Found", response, 404));
             }, err => {
-              this.loggerInstance.info("Error Retreiving User login data");
+              this.loggerInstance.debug("Error Retreiving User login data");
               return next(new ApiError("Internal Server Error", "DB error", err, 500));
             });
         }else {
+          this.loggerInstance.debug(`$$$ ${LoginService.name} User data not found`);
           return next(new ApiError("ReferenceError", "User Data not Found", result, 404));
         }
 
       }, err => {
-        this.loggerInstance.info("Error from DB");
+        this.loggerInstance.debug("Error from DB");
         return next(new ApiError("Internal Server Error", "DB error", err, 500));
       });
   }
 
   validateUser(credentials, secret) {
-    this.loggerInstance.info("========Validate User=======>");
+    this.loggerInstance.info(`$$$ ${LoginService.name} validateUser()`);
     let defer = Q.defer();
 
     this.genericRepo_.retrieve(credentials)
       .then(user => {
         if (user) {
+          this.loggerInstance.debug(`$$$ ${LoginService.name} validateUser() found`);
           let redisStore = {
               "key": "",
               "value": ""
@@ -104,6 +109,7 @@ export class LoginService {
           this.getPreferences(args)
             .then(response => {
               if (response) {
+                this.loggerInstance.debug(`$$$ ${LoginService.name} User Preferences not found`);
                 let payload = {
                     "userId": "",
                     "userEmail": "",
@@ -124,8 +130,10 @@ export class LoginService {
                 payload.landingPage = response.landingPage;
                 payload.entitlements = response.entitlements;
                 payload.role = "Provider";
+                this.loggerInstance.debug(`$$$ ${LoginService.name} Now Create Token`);
                 this.createToken(payload, secret, claims)
                   .then(token => {
+                    this.loggerInstance.debug(`$$$ ${LoginService.name} Token promise success`);
                     content.token = token;
                     inactivityCheck.token = token;
                     inactivityCheck.lastCheckIn = moment().unix(); // Math.round(new Date().getTime() / 1000);
@@ -134,31 +142,33 @@ export class LoginService {
                     redisStore.options = {
                       "ttl": this.config.tokenExpireIn
                     };
+                    this.loggerInstance.debug(`$$$ ${LoginService.name} Now Set Token in Redis`);
                     this.setTokenInRedis(redisStore)
                       .then(done => {
-                        console.log("Value added to redis", done);
+                        this.loggerInstance.debug("Value added to redis", done);
                         defer.resolve(content);
                       }, fail => {
-                        console.log("Error while adding value to redis", fail);
+                        this.loggerInstance.debug("Error while adding value to redis", fail);
                         defer.reject(new ApiError("Internal Server Error", "Redis server error", fail, 500));
                       });
                   }, noToken => {
-                    this.loggerInstance.info("Jwt token error");
+                    this.loggerInstance.debug("Jwt token error");
                     defer.reject(new ApiError("Internal Server Error", "token error", noToken, 500));
                   });
               }else {
-                this.loggerInstance.info("User preferences not found");
+                this.loggerInstance.debug("User preferences not found");
                 defer.resolve(new ApiError("ReferenceError", "User not found", response, 404));
               }
             }, fail => {
+              this.loggerInstance.debug(`$$$ ${LoginService.name} Error on user preferences`);
               defer.reject(new ApiError("Internal Server Error", "DB error", fail, 500));
             });
         }else {
-          this.loggerInstance.info("User not found");
+          this.loggerInstance.debug("User not found");
           defer.resolve(new ApiError("ReferenceError", "User not found", user, 404));
         }
       }, error => {
-        this.loggerInstance.info("Generic repo error");
+        this.loggerInstance.debug("Generic repo error");
         defer.reject(new ApiError("Internal Server Error", "DB error", error, 500));
       });
 
@@ -171,25 +181,25 @@ export class LoginService {
 
     this.genericRepo_.retrieve(projections)
       .then(success => {
-        console.log("User preferences found");
+        this.loggerInstance.debug("User preferences found");
         defer.resolve(success);
       }, fail => {
-        console.log("User preferences not found");
+        this.loggerInstance.debug("User preferences DB Error");
         defer.reject(fail);
       });
     return defer.promise;
   }
 
   createToken(payload, secret, claims) {
-    this.loggerInstance.info("=======create user token==========>");
+    this.loggerInstance.info(`$$$ ${LoginService.name} createToken() call`);
     let defer = Q.defer();
 
     jwt.sign(payload, secret, claims, (error, token) => {
       if (!error) {
-        console.log("Token Generated");
+        this.loggerInstance.debug("Token Generated");
         defer.resolve(token);
       }else {
-        console.log("token not generated", error);
+        this.loggerInstance.debug("token not generated", error);
         defer.reject(error);
       }
     });
@@ -202,8 +212,10 @@ export class LoginService {
 
     this.redis.setToken(redisStore)
       .then(tokenSet => {
+        this.loggerInstance.debug("Token Stored in redis");
         deferred.resolve(tokenSet);
       }, redisErr => {
+        this.loggerInstance.debug("Token not stored in redis");
         deferred.reject(redisErr);
       });
     return deferred.promise;
@@ -218,14 +230,14 @@ export class LoginService {
     })
       .then(result => {
         if (result) {
-          this.loggerInstance.info("success in getting token ");
+          this.loggerInstance.debug("success in getting token ");
           deferred.resolve(result);
         }else {
-          this.loggerInstance.info("Token not found");
+          this.loggerInstance.debug("Token not found");
           deferred.resolve(result);
         }
       }, err => {
-        console.log("Redis Error while getting token ", err);
+        this.loggerInstance.debug("Redis Error while getting token ", err);
         deferred.reject(err);
       });
     return deferred.promise;
@@ -256,10 +268,10 @@ export class LoginService {
     this.singleSignAuth(req.body.emailID)
       .then(loggedIn => {
         if (loggedIn) {
-          console.log("User already logged in with other device ", loggedIn);
+          this.loggerInstance.debug("User already logged in with other device ", loggedIn);
           this.userLogoutOnLogin(req)
             .then(succ => {
-              this.loggerInstance.info("First device", succ);
+              this.loggerInstance.debug("First device", succ);
               this.validateUser(args, secret)
                 .then(user => {
                   if (user instanceof ApiError) {
@@ -268,13 +280,13 @@ export class LoginService {
                   return res.status(200).send(user);
                 });
             }, failed => {
-              this.loggerInstance.info("Redis Server Error");
+              this.loggerInstance.debug("Redis Server Error");
               return next(new ApiError("Internal Server Error", "Redis Server Error", failed, 500));
             });
-          console.log("==============DONE============");
+          this.loggerInstance.debug("==============DONE============");
           return;
         }
-        this.loggerInstance.info("First device");
+        this.loggerInstance.debug("First device");
         this.validateUser(args, secret)
           .then(user => {
             if (user instanceof ApiError) {
@@ -283,13 +295,13 @@ export class LoginService {
             return res.status(200).send(user);
           });
       }, error => {
-        this.loggerInstance.info("Redis Server Error");
+        this.loggerInstance.debug("Redis Server Error");
         return next(new ApiError("Internal Server Error", "Redis Server Error", error, 500));
       });
   }
 
   userLogoutOnLogin(req) {
-    console.log("=========userlogoutonlogin===================");
+    this.loggerInstance.info("=========userlogoutonlogin===================");
     let deferred = Q.defer();
 
     this.loggerInstance.debug("=====User Logout======>", req.body.emailID);

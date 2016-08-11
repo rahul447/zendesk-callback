@@ -31,7 +31,7 @@ export class GenericService {
   }
 
   generateCSV(req) {
-    GenericService.loggerInstance.info("=======Generating CSV==========>");
+    GenericService.loggerInstance.info(`$$$ ${GenericService.name} generateCSV() =>`);
     let defer = Q.defer();
 
     repoObj.collection = "drilldown_data";
@@ -53,17 +53,17 @@ export class GenericService {
             });
 
           fStream.on("open", () => {
-            GenericService.loggerInstance.info("File created====>");
+            GenericService.loggerInstance.debug("File created====>");
             fStream.write(csv);
             fStream.end();
           })
             .on("finish", () => {
-              GenericService.loggerInstance.info("Data Written Successfully=======>");
-              GenericService.loggerInstance.info("CSV Generated");
+              GenericService.loggerInstance.debug("Data Written Successfully=======>");
+              GenericService.loggerInstance.debug("CSV Generated");
               defer.resolve();
             })
             .on("error", err => {
-              GenericService.loggerInstance.info("Error While Writing to CSV ", err);
+              GenericService.loggerInstance.debug("Error While Writing to CSV ", err);
               defer.reject(err);
             });
 
@@ -77,7 +77,7 @@ export class GenericService {
             }
           }); */
         }catch (exp) {
-          console.log("*****Exception Thrown******", exp);
+          GenericService.loggerInstance.debug("*****Exception Thrown******", exp);
           defer.reject(exp);
         }
 
@@ -101,6 +101,7 @@ export class GenericService {
         console.log("Pdf generated successfully");
         */
       }, err => {
+        GenericService.loggerInstance.debug("Database Error => ", err);
         defer.reject(new ApiError("Internal Server Error", "DB error", err, 500));
       });
 
@@ -108,6 +109,7 @@ export class GenericService {
   }
 
   generatePDFforFilteredData(req) {
+    GenericService.loggerInstance.info(`$$$ ${GenericService.name} generatePDFforFilteredData() =>`);
     let printer = new PDFDocument(fonts),
       defer = Q.defer(),
       content, columnNames, tableRowContent,
@@ -165,6 +167,7 @@ export class GenericService {
       },
       pdfDoc;
 
+    GenericService.loggerInstance.info(`$$$ ${GenericService.name} Generate columns and rows for pdf`);
     content = req.body.data;
     Object.keys(content).map(key => {
       columnNames = Object.keys(content[key]);
@@ -172,17 +175,19 @@ export class GenericService {
       docDefinition.content[1].table.body.push(tableRowContent);
     });
     columnNames.shift();
+    GenericService.loggerInstance.debug(`$$$ ${GenericService.name} Columns and rows created`);
     docDefinition.content[1].table.body.unshift(columnNames);
     console.log(JSON.stringify(docDefinition));
     pdfDoc = printer.createPdfKitDocument(docDefinition);
     pdfDoc.pipe(fs.createWriteStream("PDF/Attachment.pdf"));
-    console.log("Pdf generated successfully");
+    GenericService.loggerInstance.debug("Pdf generated successfully");
     pdfDoc.end();
     defer.resolve();
     return defer.promise;
   }
 
   generateValueOfObj(obj) {
+    GenericService.loggerInstance.debug(`$$$ ${GenericService.name} generateValueOfObj()`);
     let valuesArr = [];
 
     Object.keys(obj).map(key => {
@@ -199,7 +204,6 @@ export class GenericService {
   }
 
   getAll(req, res, next) {
-    console.log("GenericService getAll call");
     GenericService.loggerInstance.info("GenericService getAll call");
     repoObj.collection = "actionables";
     repoObj.filter = {
@@ -209,10 +213,10 @@ export class GenericService {
     repoObj.limit = 5;
     GenericService.genericRepo.getData(repoObj)
       .then(resp => {
-        GenericService.loggerInstance.info("GenericService success after retrieve call");
+        GenericService.loggerInstance.debug("GenericService success after retrieve call");
         res.status(200).send(resp);
       }, err => {
-        this.loggerInstance.info("GenericService fail after retreive call");
+        this.loggerInstance.debug("GenericService fail after retreive call", err);
         return next(new ApiError("Internal Server error", "DB error", err, 500));
       })
       .done();
@@ -228,10 +232,10 @@ export class GenericService {
     repoObj.id = req.params.id;
     GenericService.genericRepo.removeRecord(repoObj)
       .then(resp => {
-        GenericService.loggerInstance.info("GenericService success after remove call");
+        GenericService.loggerInstance.debug("GenericService success after remove call");
         res.status(200).send(resp);
       }, err => {
-        GenericService.loggerInstance.info("GenericService fail after remove call");
+        GenericService.loggerInstance.debug("GenericService fail after remove call");
         return next(new ApiError("Internal Server error", "DB error", err, 500));
       });
   }
@@ -261,7 +265,7 @@ export class GenericService {
         GenericService.loggerInstance.debug("Error received:", err);
         return next(new ApiError("Internal Server error", "Error while validating fhir endpoint", err, 500));
       }
-
+      GenericService.loggerInstance.debug("Validation Api Success");
       let response = JSON.parse(body),
         result = {};
 

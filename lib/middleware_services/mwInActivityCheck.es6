@@ -16,7 +16,7 @@ function mwInActivityCheck(req, res, next) {
   }
 
   if (config.publicUrls.indexOf(req.url) === -1) {
-    loggerInstance.info("========User Inactivity Check===========>");
+    loggerInstance.info(`$$$ ${mwInActivityCheck.name} mwInActivityCheck() call`);
     redis.getToken({
       "key": req.user.userEmail
     })
@@ -26,19 +26,20 @@ function mwInActivityCheck(req, res, next) {
           let repeatToken = req.headers.authorization.split(" ")[1];
 
           if (repeatToken !== user.token) {
+            loggerInstance.debug("Unauthorized user => Token Mismatch");
             return next(new ApiError("Internal Server Error", "Invalid token", "Invalid token", 401));
           }
         }
-        loggerInstance.debug("=======Inactivity user found, now check time========>");
+        loggerInstance.debug(`$$$ ${mwInActivityCheck.name} Check User Active Session time`);
         let currentTime = moment().unix(); // Math.round(new Date().getTime() / 1000);
 
         redisStore.lastCheckIn = currentTime;
         redisStore.token = user.token;
         if ((currentTime - Number(user.lastCheckIn)) > config.MaxInactivityTime) {
+          loggerInstance.debug(`$$$ ${mwInActivityCheck.name} Inactive Session, Please login again`);
           redis.deleteKey(req.user.userEmail)
             .then(success => {
               loggerInstance.debug("======User logged out successfully===>", success);
-              console.log("======User logged out successfully===>", success);
               return next(new ApiError("Unauthorized", "Invalid token", "Session timeout", 401));
             }, err => {
               loggerInstance.debug("===Error while logging out=>", err);
@@ -61,6 +62,7 @@ function mwInActivityCheck(req, res, next) {
             return next(new ApiError("Internal Server Error", "Redis Server Error", tokenNotSet, 500));
           });
       }else {
+        loggerInstance.debug("User not logged in");
         return next(new ApiError("Unauthorized", "User not logged in", "", 401));
       }
     }, err => {

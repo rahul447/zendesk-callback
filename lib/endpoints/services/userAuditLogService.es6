@@ -44,7 +44,7 @@ export class UserAuditLogService {
 
   getAuditLogs(req, res, next) {
 
-    console.log("in getAuditLogs===", req.isAuditTrail);
+    this.loggerInstance_.info("in getAuditLogs===", req.isAuditTrail);
 
     if (req.isAuditTrail) {
       let projection = {};

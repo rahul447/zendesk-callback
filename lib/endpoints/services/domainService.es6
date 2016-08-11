@@ -46,7 +46,7 @@ export class DomainService {
    */
 
   getDomainData(req) {
-    this.loggerInstance.info("======Get Domain Data======>");
+    this.loggerInstance.info(`$$$ ${DomainService.name} getDomainData()`);
     let projection = `dashboard.${req.params.name}`;
 
     args.collection = "users";
@@ -58,7 +58,7 @@ export class DomainService {
   }
 
   getDomainPreferences(req) {
-    this.loggerInstance.info("=======Get Domain Preferences======>");
+    this.loggerInstance.info(`$$$ ${DomainService.name} getDomainPreferences() =>`);
     let projection = `dashboard.${req.params.name}`;
 
     args.collection = "preferences";
@@ -71,7 +71,7 @@ export class DomainService {
   }
 
   getDomainDashboard(req, res, next) {
-    this.loggerInstance.info("===get Domain DashBoard====>");
+    this.loggerInstance.info(`$$$ ${DomainService.name} now getDomainDashboard() ==>`);
     let content;
 
     Q.all([
@@ -80,6 +80,7 @@ export class DomainService {
     ])
     .then(response => {
       if (response) {
+        this.loggerInstance.debug(`$$$ ${DomainService.name} Q.all output success`);
         content = merge(response[0], response[1]);
 
         //    let {portlets} = content.dashboard.financial.groups[0];
@@ -99,10 +100,10 @@ export class DomainService {
         }
         return res.status(200).send(content);
       }
-
+      this.loggerInstance.debug(`$$$ ${DomainService.name} getDomainDashboard => Domain Data not Found`);
       return next(new ApiError("ReferenceError", "Domain Data not Found", response, 404));
     }, err => {
-      console.log("Error from DB");
+      this.loggerInstance.debug(`$$$ ${DomainService.name} Error from DB`);
       return next(new ApiError("Internal Server Error", "DB error", err, 500));
     })
     .done();
