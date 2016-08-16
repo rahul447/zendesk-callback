@@ -66,7 +66,7 @@ export class DrillService {
     args._group = Number(req.params.group);
     args._portlet = Number(req.params.portlet);
 
-    return this.genericRepo_.getDrill(args);
+    return this.genericRepo_.getFilteredDrill(args);
   }
 
   getDrillDataUsers(req) {
@@ -116,6 +116,7 @@ export class DrillService {
     ])
     .then(response => {
       if (response) {
+        console.log("****GET ALL DRILL**********", response[2]);
         let drillUsers = response[0].dashboard[req.params.name].groups[req.params.group].portlets[req.params.portlet],
           drillPref = response[1].dashboard[req.params.name].groups[req.params.group].portlets[req.params.portlet],
           output = merge(drillUsers, drillPref);

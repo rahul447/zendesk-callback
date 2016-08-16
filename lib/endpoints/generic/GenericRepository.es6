@@ -151,20 +151,58 @@ export class GenericRepository {
       });
   }
   
-  lossByLocation(param) {
-    this.loggerInstance.info("Retreiving from db");
+  readQuery(query) {
+    
+    return {
+      "fields": query.fields || {},
+      "limit": query.limit || 0,
+      "skip": query.skip || 0,
+      "sort": query.sort || {}
+    };
+  }
+  
+  getFilteredDrill(param) {
     console.log(param);
-    const {collection, filter, _group, _portlet, _domain} = param,
-      aggregateObj = [
-        {
-          "$match": filter
-        },
-        {
-          "$project": {
-            
-          }
-        }
-      ]
+  
+    let {collection, filter, _group, _portlet, _domain} = param,
+      options = [],
+      query = {
+        "body": filter,
+        "fields": {},
+        "sort": {}
+      };
+      
+    query.fields[`dashboad.${_domain}.groups`] = {
+      "$slice": [_group, (_group + 1)]
+    };
+    query.fields[`dashboad.${_domain}.groups.portlets`] = {
+      "$slice": [_portlet, (_portlet + 1)]
+    };
+    query.fields[`dashboad.${_domain}.groups.portlets.drillDown.data`] = {
+      "$slice": 10
+    };
+    query.sort[`dashboad.${_domain}.groups.portlets.drillDown.data.Visitdate`] = -1;
+    
+    options.push(query.body);
+    options.push(this.readQuery(query));
+  
+    return this.db_
+      .catch(err => {
+        this.loggerInstance.debug("Connection to db is broken at create: ", err);
+        return this.connectToDb_();
+      })
+      .then(db => {
+        return Q.npost(
+          db.collection(collection), "find", options
+        )
+          .then(cursor => {
+            return Q.ninvoke(cursor, "toArray"
+            )
+              .then(results => {
+                return results;
+              });
+          });
+      });
   }
 
   getDrill(param) {
