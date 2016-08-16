@@ -150,6 +150,22 @@ export class GenericRepository {
         return err;
       });
   }
+  
+  lossByLocation(param) {
+    this.loggerInstance.info("Retreiving from db");
+    console.log(param);
+    const {collection, filter, _group, _portlet, _domain} = param,
+      aggregateObj = [
+        {
+          "$match": filter
+        },
+        {
+          "$project": {
+            
+          }
+        }
+      ]
+  }
 
   getDrill(param) {
     this.loggerInstance.info("Retreiving from db");
