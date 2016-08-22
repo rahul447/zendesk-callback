@@ -5,6 +5,7 @@ import fs from "fs";
 import Q from "q";
 import request from "request";
 import json2csv from "json2csv";
+import moment from "moment";
 
 let protectedGenericInstance,
   fonts = {
@@ -272,14 +273,15 @@ export class GenericService {
       if (req.params.endpoint === "Patient") {
         result.PatientID = response.identifier[0].value;
         result.PatientName = response.name[0].text;
-        result.DOB = new Date(response.birthDate);
+        result.DOB = moment(response.birthDate).format("MM-DD-YYYY HH:mm:ss");
         result.PatientCity = response.address[0].city;
       } else if (req.params.endpoint === "Appointment") {
         result.VisitID = response.identifier[0].value;
         result.Description = response.description;
         result.Status = response.status;
         result.Comments = response.comment;
-        result.DayofWeek = new Date(response.start);
+        result.DayofWeek =
+          moment(response.start).format("MM-DD-YYYY HH:mm:ss");
       }
       GenericService.loggerInstance
         .debug("DONE: ", body);
