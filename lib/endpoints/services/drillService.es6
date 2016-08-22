@@ -52,21 +52,22 @@ export class DrillService {
     return this.genericRepo_.paginate(args);
   }
 
-  getAllDrill(req) {
+  getLimitedDrill(req) {
     let args = {
       "collection": "",
       "filter": {}
     };
 
-    this.loggerInstance.info(`$$$ ${DrillService.name} getAllDrill for =>`, req.userId);
+    this.loggerInstance.info(`$$$ ${DrillService.name} getLimitedDrill for =>`, req.userId);
 
     args.collection = "drilldown_data";
     args.filter = {"_id": req.userId};
     args._domain = req.params.name;
-    args._group = Number(req.params.group);
-    args._portlet = Number(req.params.portlet);
+    args._group = req.params.group;
+    args._portlet = req.params.portlet;
+    args._limit = this.config.drillLimit;
 
-    return this.genericRepo_.getFilteredDrill(args);
+    return this.genericRepo_.getLimitedDrill(args);
   }
 
   getDrillDataUsers(req) {
@@ -112,11 +113,10 @@ export class DrillService {
     Q.all([
       this.getDrillDataUsers(req),
       this.getDrillPreferences(req),
-      this.getAllDrill(req)
+      this.getLimitedDrill(req)
     ])
     .then(response => {
       if (response) {
-        console.log("****GET ALL DRILL**********", response[2]);
         let drillUsers = response[0].dashboard[req.params.name].groups[req.params.group].portlets[req.params.portlet],
           drillPref = response[1].dashboard[req.params.name].groups[req.params.group].portlets[req.params.portlet],
           output = merge(drillUsers, drillPref);
@@ -141,5 +141,32 @@ export class DrillService {
         return res.status(500).send(error);
       })
     .done();
+  }
+
+  getAllDrill(req, res, next) {
+    let args = {
+      "collection": "",
+      "filter": {}
+    };
+
+    this.loggerInstance.info(`$$$ ${DrillService.name} getAllDrill for =>`, req.userId);
+
+    args.collection = "drilldown_data";
+    args.filter = {"_id": req.userId};
+    args._domain = req.params.name;
+    args._group = req.params.group;
+    args._portlet = req.params.portlet;
+
+    return this.genericRepo_.getAllDrill(args)
+      .then(result => {
+        if (result) {
+          this.loggerInstance.info(`$$$ ${DrillService.name} getAllDrill Query Result`, req.userId);
+
+          let data = result && typeof result[0] !== "undefined" ? result[0].item : "No drill Data";
+
+          return res.status(200).send(data);
+        }
+        return next(new ApiError("ReferenceError", "Drill Data not Found", result, 404));
+      });
   }
 }

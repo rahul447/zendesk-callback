@@ -150,9 +150,9 @@ export class GenericRepository {
         return err;
       });
   }
-  
+
   readQuery(query) {
-    
+
     return {
       "fields": query.fields || {},
       "limit": query.limit || 0,
@@ -160,52 +160,8 @@ export class GenericRepository {
       "sort": query.sort || {}
     };
   }
-  
-  getFilteredDrill(param) {
-    console.log(param);
-  
-    let {collection, filter, _group, _portlet, _domain} = param,
-      options = [],
-      query = {
-        "body": filter,
-        "fields": {},
-        "sort": {}
-      };
-      
-    query.fields[`dashboad.${_domain}.groups`] = {
-      "$slice": [_group, (_group + 1)]
-    };
-    query.fields[`dashboad.${_domain}.groups.portlets`] = {
-      "$slice": [_portlet, (_portlet + 1)]
-    };
-    query.fields[`dashboad.${_domain}.groups.portlets.drillDown.data`] = {
-      "$slice": 10
-    };
-    query.sort[`dashboad.${_domain}.groups.portlets.drillDown.data.Visitdate`] = -1;
-    
-    options.push(query.body);
-    options.push(this.readQuery(query));
-  
-    return this.db_
-      .catch(err => {
-        this.loggerInstance.debug("Connection to db is broken at create: ", err);
-        return this.connectToDb_();
-      })
-      .then(db => {
-        return Q.npost(
-          db.collection(collection), "find", options
-        )
-          .then(cursor => {
-            return Q.ninvoke(cursor, "toArray"
-            )
-              .then(results => {
-                return results;
-              });
-          });
-      });
-  }
 
-  getDrill(param) {
+  getAllDrill(param) {
     this.loggerInstance.info("Retreiving from db");
     console.log(param);
 
@@ -217,23 +173,25 @@ export class GenericRepository {
         {
           "$project": {
             "data": {
-              "$arrayElemAt": [`$dashboard.${_domain}.groups`, _group]
+              "$arrayElemAt": [`$dashboard.${_domain}.groups`, Number(_group)]
             }
           }
         },
         {
           "$project": {
             "value": {
-              "$arrayElemAt": ["$data.portlets", _portlet]
+              "$arrayElemAt": ["$data.portlets", Number(_portlet)]
             }
           }
         },
         {
           "$project": {
-            "item": "$value.drillDown.data",
-            "arrLength": {
-              "$size": "$value.drillDown.data"
-            }
+            "item": "$value.drillDown.data"
+          }
+        },
+        {
+          "$sort": {
+            "item.Visitdate": -1
           }
         }
       ];
@@ -252,7 +210,6 @@ export class GenericRepository {
       }, err => {
         return err;
       });
-
   }
 
   retrieve(param) {
@@ -311,11 +268,11 @@ export class GenericRepository {
       });
   }
 
-  getDrill(param) {
+  getLimitedDrill(param) {
     this.loggerInstance.info("Retreiving from db");
     console.log(param);
 
-    const {collection, filter, _group, _portlet, _domain} = param,
+    const {collection, filter, _group, _portlet, _domain, _limit} = param,
       aggregateObj = [
         {
           "$match": filter
@@ -336,10 +293,14 @@ export class GenericRepository {
         },
         {
           "$project": {
-            "item": "$value.drillDown.data",
-            "arrLength": {
-              "$size": "$value.drillDown.data"
+            "item": {
+              "$slice": ["$value.drillDown.data", _limit]
             }
+          }
+        },
+        {
+          "$sort": {
+            "item.Visitdate": -1
           }
         }
       ];
@@ -358,7 +319,6 @@ export class GenericRepository {
       }, err => {
         return err;
       });
-
   }
 
   insertMany(param) {
