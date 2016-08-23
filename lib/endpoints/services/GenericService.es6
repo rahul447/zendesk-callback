@@ -41,7 +41,7 @@ export class GenericService {
     repoObj._portlet = req.body.portletId;
     console.log(repoObj);
 
-    GenericService.genericRepo.getDrill(repoObj)
+    GenericService.genericRepo.getAllDrill(repoObj)
       .then(resp => {
         try {
           let content = resp[0].item,
@@ -66,40 +66,10 @@ export class GenericService {
               GenericService.loggerInstance.debug("Error While Writing to CSV ", err);
               defer.reject(err);
             });
-
-          /* fs.writeFile("CSV/attachment.csv", csv, err => {
-            if (err) {
-              console.log("***Error on writing to csv****", err);
-              defer.reject(new ApiError("Internal Server Error", ["Error genrating CSV"], err, 500));
-            }else {
-              console.log("CSV generated successfully");
-              defer.resolve();
-            }
-          }); */
         }catch (exp) {
           GenericService.loggerInstance.debug("*****Exception Thrown******", exp);
           defer.reject(exp);
         }
-
-        /* Object.keys(content).map(key => {
-          columnNames = Object.keys(content[key]);
-
-          if (key <= 2000) {
-            tableRowContent = this.generateValueOfObj(content[key]);
-            docDefinition.content[1].table.body.push(tableRowContent);
-          }
-        });
-        columnNames.shift();
-        docDefinition.content[1].table.body.unshift(columnNames);
-        // console.log(JSON.stringify(docDefinition));
-        // fs.writeFile('data.json', JSON.stringify(docDefinition, null, 2) , 'utf-8');
-        console.log("NOw writing to PDF=================>");
-        let createStream = fs.createWriteStream("PDF/Attachment.pdf"),
-          pdfDoc = printer.createPdfKitDocument(docDefinition);
-        pdfDoc.pipe(createStream);
-        pdfDoc.end();
-        console.log("Pdf generated successfully");
-        */
       }, err => {
         GenericService.loggerInstance.debug("Database Error => ", err);
         defer.reject(new ApiError("Internal Server Error", "DB error", err, 500));
