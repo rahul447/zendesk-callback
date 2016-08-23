@@ -66,7 +66,7 @@ var environmentVariables = require("./environmentVariables"),
         "pass": "Secure@2016"
       }
     },
-    "drillLimit": 5,
+    "drillLimit": 1000,
     "fhirValidator": {
       "baseURI": {
         "protocol": "http",
