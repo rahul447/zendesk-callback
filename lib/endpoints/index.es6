@@ -23,6 +23,7 @@ let router = express.Router(),
   domainRoute = router.route("/domain/:name"),
   // paginationRoute = router.route("/domain/:name/:group/:portlet/:pageNumber"),
   drillRoute = router.route("/domain/:name/:group/:portlet"),
+  customDrillRoute = router.route("/domain/:name/:group/:portlet/all"),
   leadershipRoute = router.route("/leadership"),
   emailRoute = router.route("/sendmail"),
   filterEmailRoute = router.route("/sendfilteredEmail"),
@@ -64,6 +65,9 @@ leadershipRoute
 drillRoute
   .get(entitlementInstance.getEntitlements.bind(entitlementInstance))
   .get(drillService.getDrillDashboard.bind(drillService));
+
+customDrillRoute
+  .get(drillService.getAllDrill.bind(drillService));
 
 emailRoute
   .post(emailService.sendmail.bind(emailService));

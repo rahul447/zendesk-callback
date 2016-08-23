@@ -151,7 +151,17 @@ export class GenericRepository {
       });
   }
 
-  getDrill(param) {
+  readQuery(query) {
+
+    return {
+      "fields": query.fields || {},
+      "limit": query.limit || 0,
+      "skip": query.skip || 0,
+      "sort": query.sort || {}
+    };
+  }
+
+  getAllDrill(param) {
     this.loggerInstance.info("Retreiving from db");
     console.log(param);
 
@@ -163,23 +173,25 @@ export class GenericRepository {
         {
           "$project": {
             "data": {
-              "$arrayElemAt": [`$dashboard.${_domain}.groups`, _group]
+              "$arrayElemAt": [`$dashboard.${_domain}.groups`, Number(_group)]
             }
           }
         },
         {
           "$project": {
             "value": {
-              "$arrayElemAt": ["$data.portlets", _portlet]
+              "$arrayElemAt": ["$data.portlets", Number(_portlet)]
             }
           }
         },
         {
           "$project": {
-            "item": "$value.drillDown.data",
-            "arrLength": {
-              "$size": "$value.drillDown.data"
-            }
+            "item": "$value.drillDown.data"
+          }
+        },
+        {
+          "$sort": {
+            "item.Visitdate": -1
           }
         }
       ];
@@ -198,7 +210,6 @@ export class GenericRepository {
       }, err => {
         return err;
       });
-
   }
 
   retrieve(param) {
@@ -257,11 +268,11 @@ export class GenericRepository {
       });
   }
 
-  getDrill(param) {
+  getLimitedDrill(param) {
     this.loggerInstance.info("Retreiving from db");
     console.log(param);
 
-    const {collection, filter, _group, _portlet, _domain} = param,
+    const {collection, filter, _group, _portlet, _domain, _limit} = param,
       aggregateObj = [
         {
           "$match": filter
@@ -282,10 +293,14 @@ export class GenericRepository {
         },
         {
           "$project": {
-            "item": "$value.drillDown.data",
-            "arrLength": {
-              "$size": "$value.drillDown.data"
+            "item": {
+              "$slice": ["$value.drillDown.data", _limit]
             }
+          }
+        },
+        {
+          "$sort": {
+            "item.Visitdate": -1
           }
         }
       ];
@@ -304,7 +319,6 @@ export class GenericRepository {
       }, err => {
         return err;
       });
-
   }
 
   insertMany(param) {
