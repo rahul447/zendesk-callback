@@ -160,13 +160,17 @@ export class DrillService {
     return this.genericRepo_.getAllDrill(args)
       .then(result => {
         if (result) {
-          this.loggerInstance.info(`$$$ ${DrillService.name} getAllDrill Query Result`, req.userId);
+          this.loggerInstance.debug(`$$$ ${DrillService.name} getAllDrill Query Result`, req.userId);
 
-          let data = result && typeof result[0] !== "undefined" ? result[0].item : "No drill Data";
+          let data = typeof result[0] !== "undefined" && result[0].item.length > 0 ? result[0].item : "No drill Data";
 
           return res.status(200).send(data);
         }
         return next(new ApiError("ReferenceError", "Drill Data not Found", result, 404));
+      })
+      .catch(err => {
+        this.loggerInstance.debug(`$$$ ${DrillService.name} getAllDrill Error `, err);
+        return next(new ApiError("Internal Server Error", "getAllDrill Catch()", err, 500));
       });
   }
 }
