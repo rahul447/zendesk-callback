@@ -159,7 +159,7 @@ export class DrillService {
 
     return this.genericRepo_.getAllDrill(args)
       .then(result => {
-        if (result) {
+        if (result.length) {
           this.loggerInstance.debug(`$$$ ${DrillService.name} getAllDrill Query Result`, req.userId);
 
           let data = typeof result[0] !== "undefined" && result[0].item.length > 0 ? result[0].item : "No drill Data";
