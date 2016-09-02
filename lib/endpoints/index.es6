@@ -30,7 +30,7 @@ let router = express.Router(),
   pdfRoute = router.route("/download"),
   getAction = router.route("/getAll"),
   removeAction = router.route("/remove/:id"),
-  fhirValidateRoute = router.route("/validate/:endpoint/:id"),
+  fhirValidateRoute = router.route("/validate/fourthlevel"),
   loginRoute = router.route("/login"),
   logoutRoute = router.route("/logout"),
   userAuditLogRoute = router.route("/userAuditLog"),
@@ -87,7 +87,7 @@ removeAction
   .post(genericService.deleteRecord.bind(genericService));
 
 fhirValidateRoute
-  .get(genericService.validateRecord.bind(genericService));
+  .post(genericService.validateRecord.bind(genericService));
 
 userAuditLogRoute
   .post(userAuditLogService.add.bind(userAuditLogService));

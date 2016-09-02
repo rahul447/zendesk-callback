@@ -5,7 +5,6 @@ import fs from "fs";
 import Q from "q";
 import request from "request";
 import json2csv from "json2csv";
-import moment from "moment";
 
 let protectedGenericInstance,
   fonts = {
@@ -212,50 +211,34 @@ export class GenericService {
   }
 
   validateRecord(req, res, next) {
-    GenericService.loggerInstance.info("Generic schema validation");
+    GenericService.loggerInstance.info("Generic schema validation", req.body);
     const url = `${
       GenericService.config.fhirValidator.baseURI.protocol
       }://${
       GenericService.config.fhirValidator.baseURI.domain
       }:${
       GenericService.config.fhirValidator.baseURI.port
-      }/fhir/v1/focus/${
-      req.params.endpoint
-      }/${
-      req.params.id
-      }`,
+      }/fhir/v1/focus/fourthlevel`,
       options = {
         "url": url,
         "headers": {
           "Content-Type": "application/json"
-        }
+        },
+        "body": JSON.stringify(req.body)
       };
 
-    request.get(options, (err, xhp, body) => {
+    console.log(url);
+    request.post(options, (err, xhp, body) => {
       if (err) {
         GenericService.loggerInstance.debug("Error received:", err);
         return next(new ApiError("Internal Server error", "Error while validating fhir endpoint", err, 500));
       }
       GenericService.loggerInstance.debug("Validation Api Success");
-      let response = JSON.parse(body),
-        result = {};
+      let response = JSON.parse(body);
 
-      if (req.params.endpoint === "Patient") {
-        result.PatientID = response.identifier[0].value;
-        result.PatientName = response.name[0].text;
-        result.DOB = moment(response.birthDate).format("MM-DD-YYYY HH:mm:ss");
-        result.PatientCity = response.address[0].city;
-      } else if (req.params.endpoint === "Appointment") {
-        result.VisitID = response.identifier[0].value;
-        result.Description = response.description;
-        result.Status = response.status;
-        result.Comments = response.comment;
-        result.DayofWeek =
-          moment(response.start).format("MM-DD-YYYY HH:mm:ss");
-      }
       GenericService.loggerInstance
         .debug("DONE: ", body);
-      res.status(200).send(result);
+      res.status(200).send(response);
     });
 
   }
