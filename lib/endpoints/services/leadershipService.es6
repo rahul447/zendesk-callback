@@ -29,7 +29,7 @@ export class LeaderShipService {
   getLeadershipPreferences(req) {
     this.loggerInstance.info(`$$$ ${LeaderShipService.name} getLeadershipPreferences() call`);
     args.collection = "preferences";
-    args.filter = {"userId": req.userId};
+    args.filter = {"_id": req.user.preferenceId};
     // _id in preferences collection indicates preference id. We don't need that.
     args.projection = {"dashboard.leadership": 1, "_id": 0};
 

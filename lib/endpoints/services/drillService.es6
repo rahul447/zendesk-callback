@@ -99,7 +99,7 @@ export class DrillService {
     this.loggerInstance.info(`$$$ ${DrillService.name} getDrillPreferences() ==>`);
 
     args.collection = "preferences";
-    args.filter = {"userId": req.userId};
+    args.filter = {"_id": req.user.preferenceId};
     // _id in preferences collection indicates preference id. We don't need that.
     args.projection = {"_id": 0};
     args.projection[projection] = 1;
