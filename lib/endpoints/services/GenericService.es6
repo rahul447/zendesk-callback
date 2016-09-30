@@ -227,8 +227,7 @@ export class GenericService {
         },
         "body": JSON.stringify(req.body)
       };
-
-    console.log(url);
+    
     request.post(options, (err, xhp, body) => {
       if (err) {
         GenericService.loggerInstance.debug("Error received:", err);
