@@ -227,7 +227,7 @@ export class GenericService {
         },
         "body": JSON.stringify(req.body)
       };
-    
+
     request.post(options, (err, xhp, body) => {
       if (err) {
         GenericService.loggerInstance.debug("Error received:", err);
@@ -240,7 +240,6 @@ export class GenericService {
         .debug("DONE: ", body);
       res.status(200).send(response);
     });
-
   }
 
   validateRecord(req, res, next) {
