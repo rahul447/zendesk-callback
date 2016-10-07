@@ -211,19 +211,50 @@ export class GenericService {
       });
   }
 
-  validateRecord(req, res, next) {
-    GenericService.loggerInstance.info("Generic schema validation");
+  validateRecordmulti(req, res, next) {
+    GenericService.loggerInstance.info("Generic schema validation", req.body);
     const url = `${
       GenericService.config.fhirValidator.baseURI.protocol
       }://${
       GenericService.config.fhirValidator.baseURI.domain
       }:${
       GenericService.config.fhirValidator.baseURI.port
-      }/fhir/v1/focus/${
-      req.params.endpoint
-      }/${
-      req.params.id
-      }`,
+      }/fhir/v1/focus/fourthlevel`,
+      options = {
+        "url": url,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": JSON.stringify(req.body)
+      };
+
+    request.post(options, (err, xhp, body) => {
+      if (err) {
+        GenericService.loggerInstance.debug("Error received:", err);
+        return next(new ApiError("Internal Server error", "Error while validating fhir endpoint", err, 500));
+      }
+      GenericService.loggerInstance.debug("Validation Api Success");
+      let response = JSON.parse(body);
+
+      GenericService.loggerInstance
+        .debug("DONE: ", body);
+      res.status(200).send(response);
+    });
+  }
+
+  validateRecord(req, res, next) {
+    GenericService.loggerInstance.info("Generic schema validation");
+    const url = `${
+        GenericService.config.fhirValidator.baseURI.protocol
+        }://${
+        GenericService.config.fhirValidator.baseURI.domain
+        }:${
+        GenericService.config.fhirValidator.baseURI.port
+        }/fhir/v1/focus/${
+        req.params.endpoint
+        }/${
+        req.params.id
+        }`,
       options = {
         "url": url,
         "headers": {
