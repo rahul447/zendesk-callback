@@ -1,6 +1,7 @@
 "use strict";
 import ApiError from "../../util/apiError";
 import otp from "otplib/lib/authenticator";
+import md5 from "md5";
 
 let args = {
   "collection": "",
@@ -63,6 +64,7 @@ export class ResetPasswordService {
   }
 
   validateResetPin(req, res, next) {
+
     args.collection = "accounts";
     args.filter = {"emailID": req.body.emailId};
     args.projection = {"resetPin": 1};
@@ -70,8 +72,38 @@ export class ResetPasswordService {
       if (!response) {
         return next(new ApiError("ReferenceError", "User Data not Found", res, 404));
       }
-      return response.status(200).send();
+      if (req.body.Pin === response.resetPin) {
+        return res.status(200).send("done");
+      }
+    }).catch(err => {
+      this.loggerInstance.debug(err);
     });
+  }
+
+  changePassword(req, res, next) {
+    args.collection = "accounts";
+    args.filter = {"emailID": req.body.emailId};
+    args.projection = {"resetPin": 1};
+    this.genericRepo_.retrieve(args).then(response => {
+      if (!response) {
+        return next(new ApiError("ReferenceError", "User Data not Found", res, 404));
+      }
+      if (req.body.Pin === response.resetPin) {
+        args.collection = "accounts";
+        args.filter = {"emailID": req.body.emailId};
+        args.projection = {
+          "$set": {"password": md5(req.body.Password)}
+        };
+        this.genericRepo_.updateRecord(args).then(result => {
+          if (!result) {
+            return next(new ApiError("ReferenceError", "User Data not Found", res, 404));
+          }
+        });
+      }
+    }).catch(err => {
+      this.loggerInstance.debug(err);
+    });
+
   }
 }
 
