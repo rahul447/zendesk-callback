@@ -38,6 +38,7 @@
     "moment": "^2.13.0",
     "mongodb": "^2.1.7",
     "node-uuid": "^1.4.7",
+    "otplib": "^3.0.1",
     "pdfkit": "^0.7.2",
     "pdfmake": "git://github.com/bpampuch/pdfmake.git",
     "phantom": "^2.0.10",
