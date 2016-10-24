@@ -281,8 +281,10 @@ export class GenericService {
         result.Description = response.description;
         result.Status = response.status;
         result.Comments = response.comment;
-        result.DayofWeek =
-          moment(response.start).format("MM-DD-YYYY HH:mm:ss");
+        if (response.start) {
+          result.DayofWeek =
+            moment(response.start).format("MM-DD-YYYY HH:mm:ss");
+        }
       }
       GenericService.loggerInstance
         .debug("DONE: ", body);
