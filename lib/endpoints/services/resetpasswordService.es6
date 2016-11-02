@@ -1,7 +1,9 @@
 "use strict";
 import ApiError from "../../util/apiError";
 import otp from "otplib/lib/authenticator";
+import jwt from "jsonwebtoken";
 import md5 from "md5";
+import Q from "q";
 
 let args = {
   "collection": "",
@@ -10,16 +12,17 @@ let args = {
 };
 
 export class ResetPasswordService {
-  constructor(genericRepo, loggerInstance, NodeMailer) {
+  constructor(genericRepo, loggerInstance, NodeMailer, config) {
     this.genericRepo_ = genericRepo;
     this.loggerInstance = loggerInstance;
     this.Nodemailer = NodeMailer;
+    this.config = config;
   }
 
   requestchangePassword(req, res, next) {
 
     this.loggerInstance.info("=== post request change Password ====>");
-    let code, secret;
+    let code, secret, secretKey;
 
     args.collection = "accounts";
     args.filter = {"emailID": req.body.emailId};
@@ -43,23 +46,45 @@ export class ResetPasswordService {
         }
       });
     }).then(() => {
-      let mailOption = {
-        "to": req.body.emailId,
-        "from": "info@cantahealth.com",
-        "text": "Hello User",
-        "html": `<footer>
+      let claims = {
+          "expiresIn": this.config.tokenExpireIn
+        },
+        payload = {
+          "userEmail": ""
+        }, mailOption;
+
+      console.log("================================", claims, payload);
+
+      secretKey = req.app.get("tokenSecret");
+
+      payload.userEmail = req.body.emailId;
+      console.log("??????????????");
+
+      this.createToken(payload, secretKey, claims)
+        .then(Token => {
+          if (!Token) {
+            return next(new ApiError("ReferenceError", "User Data not Found", res, 404));
+          }
+          mailOption = {
+            "to": req.body.emailId,
+            "from": "info@cantahealth.com",
+            "text": "Hello User",
+            "html": `<footer>
       The Pin displayed in this email can be used to change the password ${code}.
       For any query or clarification please feel free
-      to contact info@cantahealth.com</footer>`
-      };
+      to contact info@cantahealth.com.
+      <P> <a href="http://localhost:8080/#/changePassword?token=${Token})}">
+      Click here to change password</a></P></footer>`
+          };
 
-      this.Nodemailer.send(mailOption)
-        .then(resp => {
-          this.loggerInstance.debug("Mail sent Successfully");
-          res.status(200).send(resp);
-        }, err => {
-          this.loggerInstance.debug("Mail can't be sent due to Error =>", err);
-          return next(new ApiError("Internal Server Error", "Mail failure", err, 500));
+          this.Nodemailer.send(mailOption)
+            .then(resp => {
+              this.loggerInstance.debug("Mail sent Successfully");
+              res.status(200).send(resp);
+            }, err => {
+              this.loggerInstance.debug("Mail can't be sent due to Error =>", err);
+              return next(new ApiError("Internal Server Error", "Mail failure", err, 500));
+            });
         });
     });
   }
@@ -79,6 +104,29 @@ export class ResetPasswordService {
       }
     }).catch(err => {
       this.loggerInstance.debug(err);
+    });
+  }
+
+  validateUserToken(req, res, next) {
+
+    this.loggerInstance.info("=== post request validateUserToken ====>");
+    args.collection = "accounts";
+
+    let secretKey = req.app.get("tokenSecret");
+
+    this.verifyToken(req.body.token, secretKey, {}).then(tokenResult => {
+      console.log(tokenResult);
+      args.filter = {"emailID": req.body.emailId};
+      this.genericRepo_.retrieve(args).then(response => {
+        if (!response) {
+          return next(new ApiError("ReferenceError", "User Data not Found", res, 404));
+        }
+        if (req.body.Pin === response.resetPin) {
+          return res.status(200).send("done");
+        }
+      }).catch(err => {
+        this.loggerInstance.debug(err);
+      });
     });
   }
 
@@ -108,6 +156,29 @@ export class ResetPasswordService {
     }).catch(err => {
       this.loggerInstance.debug(err);
     });
+  }
+
+  createToken(payload, secret, claims) {
+    let defer = Q.defer();
+
+    jwt.sign(payload, secret, claims, (error, token) => {
+      if (!error) {
+        this.loggerInstance.debug("Token Generated");
+        defer.resolve(token);
+      } else {
+        this.loggerInstance.debug("token not generated", error);
+        defer.reject(error);
+      }
+    });
+    return defer.promise;
+  }
+
+  verifyToken(data, secretKey, options) {
+    let defer = Q.defer();
+
+    jwt.verifyData(data, secretKey, options, (error, token) => {
+    });
+    return defer.promise;
   }
 }
 

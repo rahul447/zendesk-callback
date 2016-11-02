@@ -40,6 +40,7 @@ let router = express.Router(),
   resetpasswordRoute = router.route("/requestResetPin"),
   validateResetPinRoute = router.route("/checkResetPin"),
   changePasswordRoute = router.route("/changePassword"),
+  validateuserTokenRoute = router.route("/validateUserToken"),
   redis = new RedisCache({"redisdb": config.caching, "logger": loggerInstance}),
   genericRepo = getGenericRepoInstance({"config": config, "mongodb": mongodb, "loggerInstance": loggerInstance}),
   genericService = getGenericServiceInstance(genericRepo, loggerInstance, mongodb, config),
@@ -52,7 +53,7 @@ let router = express.Router(),
   entitlementInstance = getEntitlementInstance(genericRepo, loggerInstance),
   emailService = new EmailService(loggerInstance, genericService, nodeMailerInstance),
   userAuditLogService = new UserAuditLogService(genericRepo, loggerInstance),
-  resetPasswordService = new ResetPasswordService(genericRepo, loggerInstance, nodeMailerInstance);
+  resetPasswordService = new ResetPasswordService(genericRepo, loggerInstance, nodeMailerInstance, config);
 
 domainRoute
   .get(entitlementInstance.getEntitlements.bind(entitlementInstance))
@@ -107,6 +108,9 @@ userAuditLogDownloadRoute
 
 resetpasswordRoute
   .post(resetPasswordService.requestchangePassword.bind(resetPasswordService));
+
+validateuserTokenRoute
+  .post(resetPasswordService.validateUserToken.bind(resetPasswordService));
 
 validateResetPinRoute
   .post(resetPasswordService.validateResetPin.bind(resetPasswordService));
