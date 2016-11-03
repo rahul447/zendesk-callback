@@ -40,7 +40,8 @@ app.use(expressJwt({"secret": app.get("tokenSecret")}).unless(
       "/focus-api/logout",
       "/focus-api/requestResetPin",
       "/focus-api/checkResetPin",
-      "/focus-api/changePassword"
+      "/focus-api/changePassword",
+      "/focus-api/validateUserToken"
     ]
   }
 ));

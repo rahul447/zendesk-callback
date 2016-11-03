@@ -38,7 +38,6 @@ let router = express.Router(),
   userAuditLogRoute = router.route("/userAuditLog"),
   userAuditLogDownloadRoute = router.route("/userAuditLogDownload"),
   resetpasswordRoute = router.route("/requestResetPin"),
-  validateResetPinRoute = router.route("/checkResetPin"),
   changePasswordRoute = router.route("/changePassword"),
   validateuserTokenRoute = router.route("/validateUserToken"),
   redis = new RedisCache({"redisdb": config.caching, "logger": loggerInstance}),
@@ -111,9 +110,6 @@ resetpasswordRoute
 
 validateuserTokenRoute
   .post(resetPasswordService.validateUserToken.bind(resetPasswordService));
-
-validateResetPinRoute
-  .post(resetPasswordService.validateResetPin.bind(resetPasswordService));
 
 changePasswordRoute
   .post(resetPasswordService.changePassword.bind(resetPasswordService));
