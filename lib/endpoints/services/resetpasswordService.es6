@@ -2,9 +2,8 @@
 import ApiError from "../../util/apiError";
 import otp from "otplib/lib/authenticator";
 import jwt from "jsonwebtoken";
-import md5 from "md5";
+import crypto from "crypto";
 import Q from "q";
-import moment from "moment";
 
 let args = {
   "collection": "",
@@ -41,8 +40,7 @@ export class ResetPasswordService {
         },
         payload = {
           "userEmail": "",
-          "pin": code,
-          "expireTime": new Date()
+          "pin": code
         }, mailOption, encToken;
 
       secretKey = req.app.get("tokenSecret");
@@ -63,6 +61,7 @@ export class ResetPasswordService {
             <P> <a href=${req.headers.origin}/#/changePassword?token=${encToken}>Click here to change password</a>
             </P></footer>`
           };
+          console.log("createToken , >>>>>>>>>>", mailOption);
 
           this.Nodemailer.send(mailOption)
             .then(resp => {
@@ -78,21 +77,15 @@ export class ResetPasswordService {
 
   validateUserToken(req, res, next) {
 
-    this.loggerInstance.info("=== post request validate User Token ====>");
+    this.loggerInstance.info("=== post request validate User Token ====>", req.body.token);
     args.collection = "accounts";
     let secretKey = req.app.get("tokenSecret"),
       decodeToken = new Buffer(req.body.token, "base64").toString("utf8"),
-      verifiedToken, startDate, endDate, secondsDiff;
+      verifiedToken;
 
     verifiedToken = this.verifyToken(decodeToken, secretKey);
     if (!verifiedToken) {
       return next(new ApiError("Unauthorized Token", "User is not authorized to access", "", 401));
-    }
-    startDate = moment(verifiedToken.expireTime);
-    endDate = moment(new Date());
-    secondsDiff = endDate.diff(startDate, "seconds");
-    if (secondsDiff > this.config.tokenExpireIn) {
-      return next(new ApiError("Unauthorized Token", "Time exceed to alive span", "", 401));
     }
     res.status(200).send(verifiedToken);
   }
@@ -114,7 +107,10 @@ export class ResetPasswordService {
         args.collection = "accounts";
         args.filter = {"emailID": decodeToken.userEmail};
         args.projection = {
-          "$set": {"password": md5(req.body.Password)}
+          "$set": {"password": crypto
+            .createHash("md5")
+            .update(req.body.Password)
+            .digest("hex")}
         };
         this.genericRepo_.updateRecord(args).then(result => {
           if (!result) {
@@ -143,10 +139,17 @@ export class ResetPasswordService {
     return defer.promise;
   }
 
-  verifyToken(data, secretKey) {
-    let decoded = jwt.verify(data, secretKey);
+  verifyToken(data, secretKey, next) {
+    try {
+      let decoded = jwt.verify(data, secretKey);
 
-    return decoded;
+      return decoded;
+    } catch (err) {
+      if (err.name === "TokenExpiredError") {
+        return next(new ApiError(err.name, err.message, 400));
+      }
+      return next(new ApiError(err.name, err.message, 401));
+    }
   }
 }
 

@@ -63,7 +63,7 @@ var environmentVariables = require("./environmentVariables"),
       "port": 587,
       "auth": {
         "user": "info@cantahealth.com",
-        "pass": "Access@1234"
+        "pass": "Access@123456!"
       }
     },
     "drillLimit": 1000,
