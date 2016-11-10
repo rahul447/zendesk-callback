@@ -1,6 +1,6 @@
 "use strict";
 import ApiError from "../../util/apiError";
-import otp from "otplib/lib/authenticator";
+import {authenticator} from "otplib";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import Q from "q";
@@ -33,8 +33,8 @@ export class ResetPasswordService {
         return next(new ApiError("ReferenceError", "User Data not Found", res, 404));
       }
     }).then(() => {
-      secret = otp.generateSecret();
-      code = otp.generate(secret);
+      secret = authenticator.generateSecret();
+      code = authenticator.generate(secret);
       let claims = {
           "expiresIn": this.config.tokenExpireIn
         },
@@ -61,7 +61,6 @@ export class ResetPasswordService {
             <P> <a href=${req.headers.origin}/#/changePassword?token=${encToken}>Click here to change password</a>
             </P></footer>`
           };
-          console.log("createToken , >>>>>>>>>>", mailOption);
 
           this.Nodemailer.send(mailOption)
             .then(resp => {
@@ -87,7 +86,7 @@ export class ResetPasswordService {
     if (!verifiedToken) {
       return next(new ApiError("Unauthorized Token", "User is not authorized to access", "", 401));
     }
-    res.status(200).send(verifiedToken);
+    res.status(200).send("done");
   }
 
   changePassword(req, res, next) {
