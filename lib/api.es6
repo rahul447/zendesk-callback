@@ -33,7 +33,17 @@ app.set("tokenSecret", secret);
 app.use(mwAllowCrossDomain);
 app.use(bodyParser.json());
 // Defines top middleware and routes
-app.use(expressJwt({"secret": app.get("tokenSecret")}).unless({"path": ["/focus-api/login", "/focus-api/logout"]}));
+app.use(expressJwt({"secret": app.get("tokenSecret")}).unless(
+  {
+    "path": [
+      "/focus-api/login",
+      "/focus-api/logout",
+      "/focus-api/requestResetPin",
+      "/focus-api/changePassword",
+      "/focus-api/validateUserToken"
+    ]
+  }
+));
 app.use(mwInActivityCheck);
 // app.use(mwAuthenticate);
 // app.use(mwcheckEntitlement);

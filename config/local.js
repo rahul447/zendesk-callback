@@ -57,13 +57,13 @@ var environmentVariables = require("./environmentVariables"),
     "preferences": {
       "entitlements": ["financial", "y", "z"]
     },
-    "publicUrls": ["/focus-api/login", "/focus-api/logout"],
+    "publicUrls": ["/focus-api/login", "/focus-api/logout", "/focus-api/requestResetPin", "/focus-api/checkResetPin", "/focus-api/changePassword", "/focus-api/validateUserToken"],
     "smtp": {
       "host": "smtp.apptixemail.net",
       "port": 587,
       "auth": {
-        "user": "eccpa@cantahealth.com",
-        "pass": "Secure@2016"
+        "user": "info@cantahealth.com",
+        "pass": "Access@123456!"
       }
     },
     "drillLimit": 1000,

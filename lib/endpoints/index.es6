@@ -15,6 +15,7 @@ import {getEntitlementInstance} from "../middleware_services/mwcheckEntitlement"
 import NodeMailer from "ch-nodemailer";
 import {RedisCache} from "ch-redis-cache";
 import {UserAuditLogService} from "./services/userAuditLogService";
+import {ResetPasswordService} from "./services/resetpasswordService";
 
 let router = express.Router(),
   {NODE_ENV} = process.env,
@@ -36,6 +37,9 @@ let router = express.Router(),
   logoutRoute = router.route("/logout"),
   userAuditLogRoute = router.route("/userAuditLog"),
   userAuditLogDownloadRoute = router.route("/userAuditLogDownload"),
+  resetpasswordRoute = router.route("/requestResetPin"),
+  changePasswordRoute = router.route("/changePassword"),
+  validateuserTokenRoute = router.route("/validateUserToken"),
   redis = new RedisCache({"redisdb": config.caching, "logger": loggerInstance}),
   genericRepo = getGenericRepoInstance({"config": config, "mongodb": mongodb, "loggerInstance": loggerInstance}),
   genericService = getGenericServiceInstance(genericRepo, loggerInstance, mongodb, config),
@@ -47,7 +51,8 @@ let router = express.Router(),
   nodeMailerInstance = new NodeMailer(config.smtp),
   entitlementInstance = getEntitlementInstance(genericRepo, loggerInstance),
   emailService = new EmailService(loggerInstance, genericService, nodeMailerInstance),
-  userAuditLogService = new UserAuditLogService(genericRepo, loggerInstance);
+  userAuditLogService = new UserAuditLogService(genericRepo, loggerInstance),
+  resetPasswordService = new ResetPasswordService(genericRepo, loggerInstance, nodeMailerInstance, config);
 
 domainRoute
   .get(entitlementInstance.getEntitlements.bind(entitlementInstance))
@@ -99,5 +104,14 @@ userAuditLogRoute
 userAuditLogDownloadRoute
   .post(userAuditLogService.authenticateAuditLogs.bind(userAuditLogService))
   .post(userAuditLogService.getAuditLogs.bind(userAuditLogService));
+
+resetpasswordRoute
+  .post(resetPasswordService.requestchangePassword.bind(resetPasswordService));
+
+validateuserTokenRoute
+  .post(resetPasswordService.validateUserToken.bind(resetPasswordService));
+
+changePasswordRoute
+  .post(resetPasswordService.changePassword.bind(resetPasswordService));
 
 export {router};
