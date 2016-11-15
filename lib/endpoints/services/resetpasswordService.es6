@@ -22,56 +22,75 @@ export class ResetPasswordService {
   requestchangePassword(req, res, next) {
 
     this.loggerInstance.info("=== post request change Password ====>");
-    let code, secret, secretKey;
+    let code, secret, secretKey, apiErr;
 
     args.collection = "accounts";
     args.filter = {"emailID": req.body.emailId};
     args.projection = {};
 
-    this.genericRepo_.retrieve(args).then(response => {
-      if (!response) {
-        return next(new ApiError("ReferenceError", "User Data not Found", res, 404));
-      }
-    }).then(() => {
-      secret = authenticator.generateSecret();
-      code = authenticator.generate(secret);
-      let claims = {
-          "expiresIn": this.config.tokenExpireIn
-        },
-        payload = {
-          "userEmail": "",
-          "pin": code
-        }, mailOption, encToken;
+    this.genericRepo_.retrieve(args)
+      .then(response => {
+        if (!response) {
+          apiErr = new ApiError("ReferenceError", "User Data not Found", "", 404);
+          return Q.reject(apiErr);
+        }
+        return Q("success");
+      })
+      .then(() => {
+        secret = authenticator.generateSecret();
+        code = authenticator.generate(secret);
 
-      secretKey = req.app.get("tokenSecret");
-      payload.userEmail = req.body.emailId;
-      this.createToken(payload, secretKey, claims)
-        .then(Token => {
-          if (!Token) {
-            return next(new ApiError("ReferenceError", "User token not created", res, 401));
+        args.collection = "accounts";
+        args.filter = {"emailID": req.body.emailId};
+        args.projection = {
+          "$set": {"resetPin": code}
+        };
+        this.genericRepo_.updateRecord(args).then(result => {
+          if (!result) {
+            return next(new ApiError("ReferenceError", "User Data not Found", "", 404));
           }
-          encToken = new Buffer(Token, "utf8").toString("base64");
+        });
 
-          mailOption = {
-            "to": req.body.emailId,
-            "from": "info@cantahealth.com",
-            "text": "Hello User",
-            "html": `<footer>The Pin displayed in this email can be used to change the password ${code}.
+        let claims = {
+            "expiresIn": this.config.tokenExpireIn
+          },
+          payload = {
+            "userEmail": "",
+            "pin": code
+          }, mailOption, encToken;
+
+        secretKey = req.app.get("tokenSecret");
+        payload.userEmail = req.body.emailId;
+        this.createToken(payload, secretKey, claims)
+          .then(Token => {
+            if (!Token) {
+              return next(new ApiError("ReferenceError", "User token not created", "", 401));
+            }
+            encToken = new Buffer(Token, "utf8").toString("base64");
+
+            mailOption = {
+              "to": req.body.emailId,
+              "from": "info@cantahealth.com",
+              "text": "Hello User",
+              "html": `<footer>The Pin displayed in this email can be used to change the password ${code}.
             For any query or clarification please feel free to contact info@cantahealth.com.
             <P> <a href=${req.headers.origin}/#/changePassword?token=${encToken}>Click here to change password</a>
             </P></footer>`
-          };
+            };
 
-          this.Nodemailer.send(mailOption)
-            .then(resp => {
-              this.loggerInstance.debug("Mail sent Successfully");
-              res.status(200).send(resp);
-            }, err => {
-              this.loggerInstance.debug("Mail can't be sent due to Error =>", err);
-              return next(new ApiError("Internal Server Error", "Mail failure", err, 500));
-            });
-        });
-    });
+            this.Nodemailer.send(mailOption)
+              .then(resp => {
+                this.loggerInstance.debug("Mail sent Successfully");
+                res.status(200).send(resp);
+              }, err => {
+                this.loggerInstance.debug("Mail can't be sent due to Error =>", err);
+                return next(new ApiError("Internal Server Error", "Mail failure", err, 500));
+              });
+          });
+      })
+      .catch(err => {
+        return next(err);
+      });
   }
 
   validateUserToken(req, res, next) {
@@ -98,25 +117,33 @@ export class ResetPasswordService {
     this.loggerInstance.info("=== post request change Password ====>", decodeToken);
     args.collection = "accounts";
     args.filter = {"emailID": decodeToken.userEmail};
+    args.projection = {
+      "resetPin": 1
+    };
     this.genericRepo_.retrieve(args).then(response => {
       if (!response) {
         return next(new ApiError("ReferenceError", "User Data not Found", res, 404));
       }
-      if (req.body.Pin === decodeToken.pin) {
+      if (req.body.Pin === response.resetPin) {
         args.collection = "accounts";
         args.filter = {"emailID": decodeToken.userEmail};
         args.projection = {
-          "$set": {"password": crypto
-            .createHash("md5")
-            .update(req.body.Password)
-            .digest("hex")}
+          "$set": {
+            "password": crypto
+              .createHash("md5")
+              .update(req.body.Password)
+              .digest("hex"),
+            "resetPin": ""
+          }
         };
         this.genericRepo_.updateRecord(args).then(result => {
           if (!result) {
-            return next(new ApiError("ReferenceError", "User Data not Found", res, 404));
+            return next(new ApiError("ReferenceError", "User Data not Found", "", 404));
           }
           return res.status(200).send("done");
         });
+      } else {
+        return next(new ApiError("ReferenceError", "You already update Your password once with this link", "", 403));
       }
     }).catch(err => {
       this.loggerInstance.debug(err);
