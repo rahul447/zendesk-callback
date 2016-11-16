@@ -89,6 +89,7 @@ export class ResetPasswordService {
           });
       })
       .catch(err => {
+        this.loggerInstance.debug(err);
         return next(err);
       });
   }
@@ -96,16 +97,33 @@ export class ResetPasswordService {
   validateUserToken(req, res, next) {
 
     this.loggerInstance.info("=== post request validate User Token ====>", req.body.token);
-    args.collection = "accounts";
     let secretKey = req.app.get("tokenSecret"),
       decodeToken = new Buffer(req.body.token, "base64").toString("utf8"),
-      verifiedToken;
+      verifiedToken, apiErr;
 
     verifiedToken = this.verifyToken(decodeToken, secretKey);
+
     if (!verifiedToken) {
       return next(new ApiError("Unauthorized Token", "User is not authorized to access", "", 401));
     }
-    res.status(200).send("done");
+
+    args.collection = "accounts";
+    args.filter = {"emailID": verifiedToken.userEmail};
+    args.projection = {
+      "resetPin": 1
+    };
+
+    this.genericRepo_.retrieve(args).then(response => {
+      if (!response) {
+        apiErr = new ApiError("ReferenceError", "User Data not Found", "", 404);
+        return next(apiErr);
+      } else if (verifiedToken.pin !== response.resetPin) {
+        apiErr = new ApiError("ReferenceError", "You already update Your password once with this link", "", 403);
+        return next(apiErr);
+      }
+      res.status(200).send("done");
+    });
+
   }
 
   changePassword(req, res, next) {
@@ -122,29 +140,27 @@ export class ResetPasswordService {
     };
     this.genericRepo_.retrieve(args).then(response => {
       if (!response) {
-        return next(new ApiError("ReferenceError", "User Data not Found", res, 404));
+        return next(new ApiError("ReferenceError", "User Data not Found", "", 404));
+      } else if (req.body.Pin !== response.resetPin) {
+        return next(new ApiError("ReferenceError", "You already update Your password with this OTP", "", 403));
       }
-      if (req.body.Pin === response.resetPin) {
-        args.collection = "accounts";
-        args.filter = {"emailID": decodeToken.userEmail};
-        args.projection = {
-          "$set": {
-            "password": crypto
-              .createHash("md5")
-              .update(req.body.Password)
-              .digest("hex"),
-            "resetPin": ""
-          }
-        };
-        this.genericRepo_.updateRecord(args).then(result => {
-          if (!result) {
-            return next(new ApiError("ReferenceError", "User Data not Found", "", 404));
-          }
-          return res.status(200).send("done");
-        });
-      } else {
-        return next(new ApiError("ReferenceError", "You already update Your password once with this link", "", 403));
-      }
+      args.collection = "accounts";
+      args.filter = {"emailID": decodeToken.userEmail};
+      args.projection = {
+        "$set": {
+          "password": crypto
+            .createHash("md5")
+            .update(req.body.Password)
+            .digest("hex"),
+          "resetPin": ""
+        }
+      };
+      this.genericRepo_.updateRecord(args).then(result => {
+        if (!result) {
+          return next(new ApiError("ReferenceError", "User Data not Found", "", 404));
+        }
+        return res.status(200).send("done");
+      });
     }).catch(err => {
       this.loggerInstance.debug(err);
     });
