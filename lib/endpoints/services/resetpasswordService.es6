@@ -42,7 +42,7 @@ export class ResetPasswordService {
 
         args.collection = "accounts";
         args.filter = {"emailID": req.body.emailId};
-        args.projection = {
+        args.update = {
           "$set": {"resetPin": code}
         };
         this.genericRepo_.updateRecord(args).then(result => {
@@ -146,7 +146,7 @@ export class ResetPasswordService {
       }
       args.collection = "accounts";
       args.filter = {"emailID": decodeToken.userEmail};
-      args.projection = {
+      args.update = {
         "$set": {
           "password": crypto
             .createHash("md5")
