@@ -439,7 +439,7 @@ export class GenericRepository {
   updateRecord(params) {
     this.loggerInstance.info("Retreiving from db");
 
-    let {collection, filter, projection} = params;
+    let {collection, filter, update} = params;
 
     return this.db_
       .catch(err => {
@@ -450,10 +450,10 @@ export class GenericRepository {
         this.loggerInstance.debug("Successfully connected");
         this.loggerInstance.debug(collection);
         this.loggerInstance.debug(filter);
-        this.loggerInstance.debug(projection);
+        this.loggerInstance.debug(update);
         return Q.ninvoke(
           db.collection(collection),
-          "updateOne", filter, projection
+          "updateOne", filter, update
         );
       })
       .then(findResult => {
