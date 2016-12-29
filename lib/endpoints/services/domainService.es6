@@ -5,12 +5,6 @@ import merge from "deepmerge";
 
 require("babel-polyfill");
 
-let args = {
-  "collection": "",
-  "filter": {},
-  "projection": {}
-};
-
 export class DomainService {
 
   constructor(genericRepo, loggerInstance) {
@@ -47,26 +41,34 @@ export class DomainService {
 
   getDomainData(req) {
     this.loggerInstance.info(`$$$ ${DomainService.name} getDomainData()`);
-    let projection = `dashboard.${req.params.name}`;
+    let projection = `dashboard.${req.params.name}`,
+      args = {
+        "collection": "",
+        "filter": {},
+        "projection": {}
+      };
 
     args.collection = "users";
     args.filter = {"_id": req.userId};
     args.projection[projection] = 1;
     args.projection.lastUpdatedDate = 1;
-    console.log(args);
     return this.genericRepo_.retrieve(args);
   }
 
   getDomainPreferences(req) {
     this.loggerInstance.info(`$$$ ${DomainService.name} getDomainPreferences() =>`);
-    let projection = `dashboard.${req.params.name}`;
+    let projection = `dashboard.${req.params.name}`,
+      args = {
+        "collection": "",
+        "filter": {},
+        "projection": {}
+      };
 
     args.collection = "preferences";
     args.filter = {"_id": req.user.preferenceId};
     // _id in preferences collection indicates preference id. We don't need that.
     args.projection = {"_id": 0};
     args.projection[projection] = 1;
-    console.log(args);
     return this.genericRepo_.retrieve(args);
   }
 
@@ -78,34 +80,34 @@ export class DomainService {
       this.getDomainData(req),
       this.getDomainPreferences(req)
     ])
-    .then(response => {
-      if (response) {
-        this.loggerInstance.debug(`$$$ ${DomainService.name} Q.all output success`);
-        content = merge(response[0], response[1]);
+      .then(response => {
+        if (response) {
+          this.loggerInstance.debug(`$$$ ${DomainService.name} Q.all output success`);
+          content = merge(response[0], response[1]);
 
-        //    let {portlets} = content.dashboard.financial.groups[0];
+          //    let {portlets} = content.dashboard.financial.groups[0];
 
-        if (typeof content.dashboard.financial !== "undefined") {
-          content.dashboard.financial.groups = content.dashboard.financial.groups.map(obj => {
+          if (typeof content.dashboard.financial !== "undefined") {
+            content.dashboard.financial.groups = content.dashboard.financial.groups.map(obj => {
 
-            obj.portlets = obj.portlets.map(port => {
+              obj.portlets = obj.portlets.map(port => {
 
-              if (port.hasOwnProperty("drillDown")) {
-                Reflect.deleteProperty(port, "drillDown");
-              }
-              return port;
+                if (port.hasOwnProperty("drillDown")) {
+                  Reflect.deleteProperty(port, "drillDown");
+                }
+                return port;
+              });
+              return obj;
             });
-            return obj;
-          });
+          }
+          return res.status(200).send(content);
         }
-        return res.status(200).send(content);
-      }
-      this.loggerInstance.debug(`$$$ ${DomainService.name} getDomainDashboard => Domain Data not Found`);
-      return next(new ApiError("ReferenceError", "Domain Data not Found", response, 404));
-    }, err => {
-      this.loggerInstance.debug(`$$$ ${DomainService.name} Error from DB`);
-      return next(new ApiError("Internal Server Error", "DB error", err, 500));
-    })
-    .done();
+        this.loggerInstance.debug(`$$$ ${DomainService.name} getDomainDashboard => Domain Data not Found`);
+        return next(new ApiError("ReferenceError", "Domain Data not Found", response, 404));
+      }, err => {
+        this.loggerInstance.debug(`$$$ ${DomainService.name} Error from DB`);
+        return next(new ApiError("Internal Server Error", "DB error", err, 500));
+      })
+      .done();
   }
 }
