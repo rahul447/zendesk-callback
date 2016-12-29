@@ -274,7 +274,7 @@ export class GenericService {
       if (req.params.endpoint === "Patient") {
         result.PatientID = response.identifier[0].value;
         result.PatientName = response.name[0].text;
-        result.DOB = moment(response.birthDate).format("MM-DD-YYYY HH:mm:ss");
+        result.DOB = moment(response.birthDate).format("MM-DD-YYYY");
         result.PatientCity = response.address[0].city;
       } else if (req.params.endpoint === "Appointment") {
         result.VisitID = response.identifier[0].value;
