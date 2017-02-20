@@ -50,7 +50,7 @@ let router = express.Router(),
   drillService = new DrillService(genericRepo, loggerInstance, config),
   nodeMailerInstance = new NodeMailer(config.smtp),
   entitlementInstance = getEntitlementInstance(genericRepo, loggerInstance),
-  emailService = new EmailService(loggerInstance, genericService, nodeMailerInstance),
+  emailService = new EmailService(loggerInstance, genericService, nodeMailerInstance, config),
   userAuditLogService = new UserAuditLogService(genericRepo, loggerInstance),
   resetPasswordService = new ResetPasswordService(genericRepo, loggerInstance, nodeMailerInstance, config);
 
@@ -115,3 +115,4 @@ changePasswordRoute
   .post(resetPasswordService.changePassword.bind(resetPasswordService));
 
 export {router};
+

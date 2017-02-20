@@ -62,8 +62,8 @@ var environmentVariables = require("./environmentVariables"),
       "host": "smtp.apptixemail.net",
       "port": 587,
       "auth": {
-        "user": "info@cantahealth.com",
-        "pass": "Access@123456!"
+        "user": "focus@cantahealth.com",
+        "pass": "apple@1234"
       }
     },
     "drillLimit": 1000,

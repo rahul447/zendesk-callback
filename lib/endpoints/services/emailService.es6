@@ -1,22 +1,24 @@
 "use strict";
 import ApiError from "../../util/apiError";
+
 export class EmailService {
 
-  constructor(loggerInstance, genericService, NodeMailer) {
+  constructor(loggerInstance, genericService, NodeMailer, config) {
     this.loggerInstance = loggerInstance;
     this.genericService = genericService;
     this.Nodemailer = NodeMailer;
+    this.config = config;
   }
   sendmail(req, res, next) {
     this.loggerInstance.info(`$$$ ${EmailService.name} sendmail() =>`);
     let mailOption = {
       "to": req.body.to,
-      "from": "eccpa@cantahealth.com",
-      "text": "Hello ECCPA",
+      "from": this.config.smtp.auth.user,
+      "text": "Hello",
       "html": `<footer>
       The data displayed in this email is the result of drill down from ${req.body.domain} dashboard.Please do not reply
        to this e-mail, as it was sent from an unattended e-mail address. For any query or clarification please feel free
-        to contact eccpa@cantahealth.com</footer>`,
+        to contact ${this.config.smtp.auth.user}</footer>`,
       "attachments": [{
         "file": "attachment.csv",
         "path": "CSV/attachment.csv"
@@ -46,12 +48,12 @@ export class EmailService {
     this.loggerInstance.info(`$$$ ${EmailService.name} sendFilteredDataMail() =>`);
     let mailOption = {
       "to": req.body.to,
-      "from": "eccpa@cantahealth.com",
-      "text": "Hello ECCPA",
+      "from": this.config.smtp.auth.user,
+      "text": "Hello",
       "html": `<footer>
       The data displayed in this email is the result of drill down from ${req.body.domain} dashboard.Please do not reply
        to this e-mail, as it was sent from an unattended e-mail address. For any query or clarification please feel free
-        to contact eccpa@cantahealth.com</footer>`,
+        to contact ${this.config.smtp.auth.user}</footer>`,
       "attachments": [{
         "file": "Attachment.pdf",
         "path": "PDF/Attachment.pdf"
