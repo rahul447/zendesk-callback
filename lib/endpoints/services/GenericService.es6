@@ -6,6 +6,7 @@ import Q from "q";
 import request from "request";
 import json2csv from "json2csv";
 import moment from "moment";
+import path from "path";
 
 let protectedGenericInstance,
   fonts = {
@@ -47,7 +48,7 @@ export class GenericService {
         try {
           let content = resp[0].item,
             columnNames = Object.keys(content[0]),
-            fStream = fs.createWriteStream("CSV/attachment.csv"),
+            fStream = fs.createWriteStream(path.join(__dirname, "../../../CSV/attachment.csv")),
             csv = json2csv({
               "data": content,
               "fields": columnNames
