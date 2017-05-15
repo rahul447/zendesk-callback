@@ -82,10 +82,10 @@
     "catch"
   ],
 
-  "requireCapitalizedConstructors": true,
+  "requireCapitalizedConstructors": false,
   "requireDotNotation": true,
   "disallowYodaConditions": true,
-  "requireSpaceAfterLineComment": true,
+  "requireSpaceAfterLineComment": false,
   "validateParameterSeparator": ", ",
   "requireQuotedKeysInObjects": true
 }

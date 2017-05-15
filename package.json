@@ -1,11 +1,11 @@
 {
-  "name": "focus-api",
+  "name": "zendesk-callback",
   "version": "1.0.0",
   "author": {
-    "name": "CantaHealth Product Development team",
-    "email": "teamcanta@cantahealth.com"
+    "name": "Rahul Khanna",
+    "email": "rahul.khanna@zimplistic.com"
   },
-  "description": "FOCUS API",
+  "description": "Zendesk Callback",
   "main": "dist/api.js",
   "engines": {
     "node": ">=4.2.2"
@@ -24,9 +24,6 @@
   "dependencies": {
     "babel-polyfill": "^6.7.4",
     "body-parser": "^1.15.0",
-    "ch-logger": "2.3.0",
-    "ch-nodemailer": "^1.1.0",
-    "ch-redis-cache": "^1.6.1",
     "deepmerge": "^0.2.10",
     "express": "^4.13.4",
     "express-domain-middleware": "^0.1.0",
