@@ -91,7 +91,7 @@
     "no-new": 2,                                // - disallow use of the new operator when not part of an assignment or comparison
     "no-octal-escape": 2,                       // - disallow use of octal escape sequences in string literals, such as var foo = "Copyright \251";
     "no-octal": 2,                              // - disallow use of octal literals (recommended)
-    "no-param-reassign": 2,                     // - disallow reassignment of function parameters
+    "no-param-reassign": 0,                     // - disallow reassignment of function parameters
     // "no-process-env": 2,                        // - disallow use of process.env
     "no-proto": 2,                              // - disallow usage of __proto__ property
     "no-redeclare": 2,                          // - disallow declaring the same variable more than once (recommended)
@@ -165,11 +165,11 @@
       }
     ],                                          // - this option enforces minimum and maximum identifier lengths (variable names, property names etc.) (off by default)
     "id-match": 0,                              // - require identifiers to match the provided regular expression
-    "indent": [2, 2,                            // - specify tab or space width for your code
+    /*"indent": [2, 2,                            // - specify tab or space width for your code
       {
         "SwitchCase": 1
       }
-    ],
+    ],*/
     "key-spacing": 2,                           // - enforce spacing between keys and values in object literal properties
     "lines-around-comment": [2,
       {
@@ -185,7 +185,7 @@
     "max-nested-callbacks": [2, 6],             // - specify the maximum depth callbacks can be nested
     "new-cap": 0,                               // - require a capital letter for constructors
     "new-parens": 2,                            // - disallow the omission of parentheses when invoking a constructor with no arguments
-    "newline-after-var": 2,                     // - require or disallow an empty newline after variable declarations
+    "newline-after-var": 0,                     // - require or disallow an empty newline after variable declarations
     "no-array-constructor": 2,                  // - disallow use of the Array constructor
     "no-continue": 2,                           // - disallow use of the continue statement
     "no-inline-comments": 0,                    // - disallow comments inline after code
@@ -200,8 +200,8 @@
     "no-underscore-dangle": 0,                  // - disallow dangling underscores in identifiers
     "no-unneeded-ternary": 2,                   // - disallow the use of Boolean literals in conditional expressions
     "object-curly-spacing": 2,                  // - require or disallow padding inside curly braces
-    "one-var": 2,                               // - require or disallow one variable declaration per function
-    "operator-assignment": [2, "always"],       // - require assignment operator shorthand where possible or prohibit it entirely
+    "one-var": 0,                               // - require or disallow one variable declaration per function
+    // "operator-assignment": [2, "always"],       // - require assignment operator shorthand where possible or prohibit it entirely
     "operator-linebreak": 2,                    // - enforce operators to be placed before or after line breaks
     "padded-blocks": 0,                         // - enforce padding within blocks
     "quote-props": 2,                           // - require quotes around object literal property names
@@ -209,8 +209,8 @@
     "semi-spacing": 2,                          // - enforce spacing before and after semicolons
     "semi": 2,                                  // - require or disallow use of semicolons instead of ASI
     "sort-vars": 0,                             // - sort variables within the same declaration block
-    "space-after-keywords": 2,                  // - require a space after certain keywords
-    "space-before-blocks": 2,                   // - require or disallow a space before blocks
+    "space-after-keywords": 0,                  // - require a space after certain keywords
+    "space-before-blocks": 0,                   // - require or disallow a space before blocks
     "space-before-function-paren": [2,
       {
         "anonymous": "always",
@@ -227,7 +227,7 @@
     // ECMAScript 6
     // These rules are only relevant to ES6 environments.
 
-    "arrow-parens": [2, "as-needed"],           // - require parens in arrow function arguments
+    // "arrow-parens": [2, "as-needed"],           // - require parens in arrow function arguments
     "arrow-spacing": 2,                         // - require space before/after arrow function's arrow
     "constructor-super": 2,                     // - verify calls of super() in constructors
     "generator-star-spacing": 2,                // - enforce spacing around the * in generator functions

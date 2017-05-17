@@ -8,10 +8,6 @@ var _bodyParser = require("body-parser");
 
 var _bodyParser2 = _interopRequireDefault(_bodyParser);
 
-var _methodOverride = require("method-override");
-
-var _methodOverride2 = _interopRequireDefault(_methodOverride);
-
 var _mwAllowCrossDomain = require("./middleware_services/mwAllowCrossDomain");
 
 var _mwAllowCrossDomain2 = _interopRequireDefault(_mwAllowCrossDomain);
@@ -21,10 +17,6 @@ var _index = require("./endpoints/index");
 var _expressDomainMiddleware = require("express-domain-middleware");
 
 var _expressDomainMiddleware2 = _interopRequireDefault(_expressDomainMiddleware);
-
-var _expressJwt = require("express-jwt");
-
-var _expressJwt2 = _interopRequireDefault(_expressJwt);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -43,8 +35,6 @@ app.use(_mwAllowCrossDomain2.default);
 app.use(_bodyParser2.default.json());
 
 app.use("" + urlPrefix, _index.router);
-//app.use(methodOverride);
-//app.use(mwErrorHandler);
 
 // Starts the app
 app.listen(app.get("port"), app.get("domain"), function () {

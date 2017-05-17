@@ -2,11 +2,9 @@
 
 import express from "express";
 import bodyParser from "body-parser";
-import methodOverride from "method-override";
 import mwAllowCrossDomain from "./middleware_services/mwAllowCrossDomain";
 import {router} from "./endpoints/index";
 import domain from "express-domain-middleware";
-import expressJwt from "express-jwt";
 
 let {NODE_ENV} = process.env,
   nodeEnv = NODE_ENV || "local",
@@ -23,8 +21,6 @@ app.use(mwAllowCrossDomain);
 app.use(bodyParser.json());
 
 app.use(`${urlPrefix}`, router);
-//app.use(methodOverride);
-//app.use(mwErrorHandler);
 
 // Starts the app
 app.listen(app.get("port"), app.get("domain"), function () {

@@ -9,7 +9,9 @@ var _express = require("express");
 
 var _express2 = _interopRequireDefault(_express);
 
-var _testService = require("./services/testService");
+var _CommentUpdateService = require("./services/CommentUpdateService");
+
+var _firebaseService = require("./services/firebaseService");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -18,10 +20,11 @@ var router = _express2.default.Router(),
     nodeEnv = NODE_ENV || "local",
     config = Object.freeze(require("../../config/" + nodeEnv)),
     testCallback = router.route("/testCallback"),
-    test = new _testService.testService(config);
+    firebaseServiceObject = new _firebaseService.firebaseService(config),
+    CommentUpdateServiceObject = new _CommentUpdateService.CommentUpdateService(config, firebaseServiceObject);
 
 
-testCallback.get(test.testCallback.bind(test));
+testCallback.get(CommentUpdateServiceObject.extractTicketId.bind(CommentUpdateServiceObject));
 
 exports.router = router;
 //# sourceMappingURL=index.js.map

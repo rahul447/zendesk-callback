@@ -28,17 +28,19 @@
     "express": "^4.13.4",
     "express-domain-middleware": "^0.1.0",
     "express-jwt": "^3.4.0",
+    "firebase": "^3.9.0",
     "json2csv": "^3.6.2",
     "jsonwebtoken": "^6.2.0",
+    "linebreak": "^0.3.0",
     "method-override": "^2.3.5",
     "moment": "^2.13.0",
     "mongodb": "^2.1.7",
     "node-uuid": "^1.4.7",
     "otplib": "^3.0.1",
-    "linebreak": "^0.3.0",
     "pdfmake": "^0.1.22",
     "q": "^1.4.1",
-    "request": "^2.69.0"
+    "request": "^2.69.0",
+    "url": "^0.11.0"
   },
   "devDependencies": {
     "babel-eslint": "^5.0.0",

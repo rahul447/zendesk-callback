@@ -10,7 +10,7 @@ var environmentVariables = require("./environmentVariables"),
       "port": 8010
     },
     "logger": {
-      name: "focus-api",
+      name: "zendesk-callback",
       "streams": [
         {
           "level": environmentVariables.LOGGING_LEVEL,
@@ -39,6 +39,14 @@ var environmentVariables = require("./environmentVariables"),
     },
     "tokenExpireIn": 7200,
     "urlPrefix": "/",
+    "firebaseDetails" : {
+      apiKey: "AIzaSyDL_IlplfGXyGi03nehvFxqDplH5tc7Eio",
+      authDomain: "api-project-164414928618.firebaseapp.com",
+      databaseURL: "https://api-project-164414928618.firebaseio.com",
+      projectId: "api-project-164414928618",
+      storageBucket: "api-project-164414928618.appspot.com",
+      messagingSenderId: "164414928618"
+    }
   };
 
 module.exports = config;
