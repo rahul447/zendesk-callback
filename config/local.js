@@ -26,27 +26,22 @@ var environmentVariables = require("./environmentVariables"),
         }
       ]
     },
-    "authorization": {
-      "authorize": false
-    },
-    "caching": {
-      "host": environmentVariables.REDIS_HOST,
-      "port": environmentVariables.REDIS_PORT,
-      "ttl": 24 * 60 * 60
-    },
     "environmentVariableChecker": {
       "isEnabled": false
     },
-    "tokenExpireIn": 7200,
-    "urlPrefix": "/",
+    "urlPrefix": "/zendesk-callback",
     "firebaseDetails" : {
-      apiKey: "AIzaSyDL_IlplfGXyGi03nehvFxqDplH5tc7Eio",
-      authDomain: "api-project-164414928618.firebaseapp.com",
-      databaseURL: "https://api-project-164414928618.firebaseio.com",
-      projectId: "api-project-164414928618",
-      storageBucket: "api-project-164414928618.appspot.com",
-      messagingSenderId: "164414928618"
-    }
+      "apiKey": "AIzaSyDL_IlplfGXyGi03nehvFxqDplH5tc7Eio",
+      "authDomain": "api-project-164414928618.firebaseapp.com",
+      "databaseURL": "https://api-project-164414928618.firebaseio.com",
+      "projectId": "api-project-164414928618",
+      "storageBucket": "api-project-164414928618.appspot.com",
+      "messagingSenderId": "164414928618"
+    },
+   "firebaseDbKeys":{
+      "Comments": "ticketComment",
+      "NewTicket": "newTicket"
+    },
   };
 
 module.exports = config;

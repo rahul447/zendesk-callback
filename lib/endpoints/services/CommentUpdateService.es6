@@ -4,7 +4,7 @@ export class CommentUpdateService {
   constructor(config, firebaseServiceObject) {
     this.config = config;
     this.firebaseServiceObject = firebaseServiceObject;
-    this.triggerType = "ticketComment";
+    this.triggerType = this.config.firebaseDbKeys.Comments;
   }
 
   extractTicketId(req, res) {
