@@ -1,25 +1,19 @@
 "use strict";
 
 import express from "express";
-import {CommentUpdateService} from "./services/CommentUpdateService";
-import {NewTicketService} from "./services/NewTicketService";
+import {ticketService} from "./services/ticketService";
 import {firebaseService} from "./services/firebaseService";
 
 let router = express.Router(),
 {NODE_ENV} = process.env,
 nodeEnv = NODE_ENV || "local",
 config = Object.freeze(require("../../config/" + nodeEnv)),
-commentsCallback = router.route("/" + config.firebaseDbKeys.Comments),
-newTicketCallback = router.route("/" + config.firebaseDbKeys.NewTicket),
+
+zendeskCallback = router.route("/"),
 firebaseServiceObject = new firebaseService(config),
-CommentUpdateServiceObject = new CommentUpdateService(config, firebaseServiceObject),
-NewTicketServiceObject = new NewTicketService(config, firebaseServiceObject);
+ticketServiceObject = new ticketService(config, firebaseServiceObject);
 
-commentsCallback
-    .get(CommentUpdateServiceObject.extractTicketId.bind(CommentUpdateServiceObject));
-
-newTicketCallback
-    .get(NewTicketServiceObject.trackNewTicket.bind(NewTicketServiceObject));
+zendeskCallback.get(ticketServiceObject.getRequestType.bind(ticketServiceObject));
 
 export {router};
 

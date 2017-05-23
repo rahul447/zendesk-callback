@@ -29,5 +29,12 @@ export class firebaseService {
             });
         });
     }
+
+    removeFromFirebase(key, ticketId) {
+        return new Promise((resolve) => {
+            this.firebaseDatabaseObject.ref(key + "/" + ticketId).remove();
+            resolve();
+        });
+    }
 }
 

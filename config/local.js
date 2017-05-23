@@ -37,11 +37,7 @@ var environmentVariables = require("./environmentVariables"),
       "projectId": "api-project-164414928618",
       "storageBucket": "api-project-164414928618.appspot.com",
       "messagingSenderId": "164414928618"
-    },
-   "firebaseDbKeys":{
-      "Comments": "ticketComment",
-      "NewTicket": "newTicket"
-    },
+    }
   };
 
 module.exports = config;
